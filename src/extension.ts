@@ -6,6 +6,7 @@ import * as glob from "glob";
 import * as path from "path";
 import {promisify} from "util";
 import { existsSync } from 'fs';
+import * as configurationProvider from './debugConfigurationProvider';
 
 type OutputConfiguration = { os: string, arch:string, configuration: string };
 
@@ -25,6 +26,8 @@ export function activate(context: vscode.ExtensionContext) {
 		let selectedTest = await promptQuickPick(await getAllBuiltRuntimeTests(workspaceFolder, config), { title: "Select a runtime test to run." });
 		vscode.window.showInformationMessage(`Selected test '${selectedTest}' on config '${config.os}.${config.arch}.${config.configuration}'`);
 	}));
+
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('dotnet-runtime', configurationProvider));
 }
 
 // this method is called when your extension is deactivated
