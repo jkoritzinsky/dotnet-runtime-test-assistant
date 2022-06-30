@@ -12,7 +12,9 @@
 	"activationEvents": [
 		"onCommand:dotnet-runtime-test-assistant.selectRuntimeTestPath",
 		"onDebugResolve:rt-runtimetest",
-		"onDebugDynamicConfigurations:rt-runtimetest"
+		"onDebugDynamicConfigurations:rt-runtimetest",
+		"onDebugResolve:rt-cg2corelib",
+		"onDebugDynamicConfigurations:rt-cg2corelib"
 	],
 	"main": "./out/extension.js",
 	"contributes": {

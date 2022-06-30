@@ -5,8 +5,9 @@ import {promisify} from "util";
 import { existsSync } from 'fs';
 import * as os from "os";
 import * as vscode from 'vscode';
+import { getRuntimeTestArtifactsPath } from "./helpers";
 
-type OutputConfiguration = { os: string, arch:string, configuration: string };
+export type OutputConfiguration = { os: string, arch:string, configuration: string };
 
 export async function promptUserForTargetConfiguration(options: { promptPrefix: string, showChecked: boolean, defaultConfiguration: string }): Promise<OutputConfiguration | undefined> {
 	let targetOS : string;
@@ -79,7 +80,7 @@ export async function getRuntimeWorkspaceFolder() {
 }
 
 async function getAllBuiltRuntimeTests(workspaceFolder: vscode.Uri, configuration: OutputConfiguration) {
-	const testPathRoot = `${workspaceFolder.fsPath}${path.sep}artifacts${path.sep}tests${path.sep}coreclr${path.sep}${configuration.os}.${configuration.arch}.${configuration.configuration}`;
+	const testPathRoot = getRuntimeTestArtifactsPath(workspaceFolder, configuration);
 	const extension = configuration.os === "windows" ? ".cmd" : ".sh";
 	let builtTestsWithScripts = await promisify(glob)(`**/*${extension}`, { cwd: testPathRoot });
 	return builtTestsWithScripts.map(scriptPath => {

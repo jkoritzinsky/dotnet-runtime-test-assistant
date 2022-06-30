@@ -1,39 +1,22 @@
 import { debug } from "console";
 import * as path from "path";
 import * as vscode from 'vscode';
-import * as userPrompts from './userPrompts';
+import * as userPrompts from '../userPrompts';
+import { transformEnvBlock, getRuntimeTestArtifactsPath, DebugConfigurationBase } from '../helpers';
 
-interface DebugConfigurationBase extends vscode.DebugConfiguration
-{
-    env: { [key: string]: string; },
-    cwd: string,
-    args?: string[],
-    request: 'launch',
-    stopAtEntry: boolean
-}
+type DebugConfigurationType = 'rt-runtimetest';
+
+export const DEBUG_CONFIGURATION_TYPE : DebugConfigurationType = 'rt-runtimetest';
 
 interface RuntimeTestConfiguration extends DebugConfigurationBase
 {
-    type: "rt-runtimetest",
+    type: DebugConfigurationType,
     dotenvPath?: string,
 }
 
 function isRuntimeTestConfiguration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is RuntimeTestConfiguration
 {
-    return debugConfiguration.type === "rt-runtimetest";
-}
-
-function transformEnvBlock(env: { [key: string]: string }): { key: string, value: string }[]
-{
-    let result = [];
-
-    for (const key in env) {
-        if (Object.prototype.hasOwnProperty.call(env, key)) {
-            result.push({ key: key, value: env[key] });
-        }
-    }
-
-    return result;
+    return debugConfiguration.type === DEBUG_CONFIGURATION_TYPE;
 }
 
 function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration, corerun: string, runtimeTest: string): vscode.DebugConfiguration
@@ -88,7 +71,7 @@ export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | und
 {
     return [
         {
-            type: 'rt-runtimetest',
+            type: DEBUG_CONFIGURATION_TYPE,
             request: 'launch',
             name: 'Launch Runtime Test',
             args: [],
@@ -108,8 +91,8 @@ export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder |
         if (!configuration) {
             return undefined;
         }
-        let artifactPath = folder.uri.fsPath + `${path.sep}artifacts${path.sep}tests${path.sep}coreclr${path.sep}${configuration.os}.${configuration.arch}.${configuration.configuration}${path.sep}`;
-        let corerun = artifactPath + `Tests${path.sep}Core_Root${path.sep}corerun${configuration.os === 'windows' ? '.exe' : ''}`;
+        let artifactPath = getRuntimeTestArtifactsPath(folder.uri, configuration);
+        let corerun = path.join(artifactPath, 'Tests', 'Core_Root', `corerun${configuration.os === 'windows' ? '.exe' : ''}`);
         let runtimeTest = artifactPath + await userPrompts.promptUserForRuntimeTest({ workspace: folder.uri, configuration: configuration });
 
         if (!runtimeTest) {

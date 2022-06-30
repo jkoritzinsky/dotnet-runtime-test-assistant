@@ -1,7 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import * as configurationProvider from './debugConfigurationProvider';
+import * as runtimeTestProvider from './providers/runtimetest';
+import * as crossgen2TestProvider from './providers/crossgen2';
 import * as userPrompts from './userPrompts';
 
 // this method is called when your extension is activated
@@ -21,8 +22,10 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`Selected test '${selectedTest}' on config '${config.os}.${config.arch}.${config.configuration}'`);
 	}));
 
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('rt-runtimetest', configurationProvider, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('rt-runtimetest', configurationProvider));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(runtimeTestProvider.DEBUG_CONFIGURATION_TYPE, runtimeTestProvider, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(runtimeTestProvider.DEBUG_CONFIGURATION_TYPE, runtimeTestProvider));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(crossgen2TestProvider.DEBUG_CONFIGURATION_TYPE, crossgen2TestProvider, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(crossgen2TestProvider.DEBUG_CONFIGURATION_TYPE, crossgen2TestProvider));
 }
 
 // this method is called when your extension is deactivated
