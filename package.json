@@ -10,7 +10,9 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:dotnet-runtime-test-assistant.selectRuntimeTestPath"
+		"onCommand:dotnet-runtime-test-assistant.selectRuntimeTestPath",
+		"onDebugResolve:rt-runtimetest",
+		"onDebugDynamicConfigurations:rt-runtimetest"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
