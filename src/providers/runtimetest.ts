@@ -93,11 +93,13 @@ export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder |
         }
         let artifactPath = getRuntimeTestArtifactsPath(folder.uri, configuration);
         let corerun = path.join(artifactPath, 'Tests', 'Core_Root', `corerun${configuration.os === 'windows' ? '.exe' : ''}`);
-        let runtimeTest = artifactPath + await userPrompts.promptUserForRuntimeTest({ workspace: folder.uri, configuration: configuration });
+        let runtimeTest = await userPrompts.promptUserForRuntimeTest({ workspace: folder.uri, configuration: configuration });
 
         if (!runtimeTest) {
             return undefined;
         }
+
+        runtimeTest = path.join(artifactPath, runtimeTest);
 
         if (configuration.os === 'windows') {
             return transformToCppvsdbgConfig(debugConfiguration, corerun, runtimeTest);
