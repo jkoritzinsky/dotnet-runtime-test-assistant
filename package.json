@@ -23,6 +23,58 @@
 				"command": "dotnet-runtime-test-assistant.selectRuntimeTestPath",
 				"title": "Select runtime test path"
 			}
+		],
+		"debuggers" :[
+			{
+				"type": "rt-runtimetest",
+				"label": "Debug runtime test",
+				"configurationAttributes": {
+					"launch": {
+						"properties" : {
+							"dotenvPath" : {
+								"type": "string",
+								"description": "A path to a .env file"
+							}
+						}
+					}
+				},
+				"configurationSnippets": [
+					{
+						"label" : "DN/RT-Assistant: Launch Runtime Test",
+						"description": "A new configuration for running a runtime test.",
+						"body" : {
+							"name" : "Launch Runtime Test",
+							"type": "rt-runtimetest",
+							"request": "launch"
+						}
+					}
+				]
+			},
+			{
+				"type": "rt-cg2corelib",
+				"label": "Debug running Crossgen2 on System.Private.CoreLib",
+				"configurationAttributes": {
+					"launch": {
+						"properties" : {
+							"stopOnEntry" : {
+								"type": "boolean",
+								"description": "Should the program pause as soon as Main is executed."
+							}
+						}
+					}
+				},
+				"configurationSnippets": [
+					{
+						"label" : "DN/RT-Assistant: Launch Crossgen2 against System.Private.CoreLib",
+						"description": "A new configuration for running crossgen2 to generate native code for System.Private.CoreLib.",
+						"body" : {
+							"name" : "Launch Crossgen2 against System.Private.CoreLib",
+							"type": "rt-cg2corelib",
+							"request": "launch"
+						}
+					}
+				]
+			}
 		]
 	},
 	"scripts": {
