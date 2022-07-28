@@ -15,6 +15,18 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"type": "npm",
+			"script": "publish-server",
+			"problemMatcher": "$msCompile",
+			"isBackground": false,
+			"presentation": {
+				"reveal": "never"
+			},
+			"group": {
+				"kind": "build"
+			}
 		}
 	]
 }

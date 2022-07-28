@@ -2,19 +2,11 @@
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.Logging;
-using StreamJsonRpc;
 
 namespace AssistantServer;
 
 internal sealed partial class MSBuildRunner
 {
-    [LoggerMessage(
-        EventId = 0,
-        Level = LogLevel.Trace,
-        Message = "Getting target frameworks from project file: {projectFile}"
-    )]
-    private static partial void LogGetProjectTargetFrameworks(ILogger logger, string projectFile);
-
     private readonly ILogger logger;
 
     public MSBuildRunner(ILogger logger)
@@ -29,7 +21,7 @@ internal sealed partial class MSBuildRunner
 
     public string GetProjectTargetFrameworks(string projectPath)
     {
-        LogGetProjectTargetFrameworks(logger, projectPath);
+        Log.GetProjectTargetFrameworks(logger, projectPath);
         var project = new Project(ProjectRootElement.Open(projectPath));
         var targetFrameworks = project.GetPropertyValue("TargetFrameworks");
         return !string.IsNullOrEmpty(targetFrameworks) ? targetFrameworks : project.GetPropertyValue("TargetFramework");

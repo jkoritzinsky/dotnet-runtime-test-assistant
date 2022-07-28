@@ -3,6 +3,7 @@ import * as rpc from 'vscode-jsonrpc/node';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { getRuntimeWorkspaceFolder } from './userPrompts';
+import * as os from "os";
 import log from './log';
 
 export function setServerPathFromExtensionContext(context: vscode.ExtensionContext)
@@ -13,6 +14,13 @@ export function setServerPathFromExtensionContext(context: vscode.ExtensionConte
 let serverPath: string = null!;
 
 let currentServerConnection: rpc.MessageConnection | null = null;
+
+function getDotnetScriptExtension() {
+    if (os.platform() === "cygwin" || os.platform() === "win32") {
+        return ".cmd";
+    }
+    return ".sh";
+}
 
 export async function getOrStartServerConnection(): Promise<rpc.MessageConnection | null>
 {
@@ -27,7 +35,13 @@ export async function getOrStartServerConnection(): Promise<rpc.MessageConnectio
         return null;
     }
     log(`starting server process at path: '${serverPath}'`);
-    let serverProc = cp.spawn(serverPath);
+    let serverProc = cp.spawn(
+        path.join(runtimeWorkspaceFolder.fsPath, `dotnet${getDotnetScriptExtension()}`),
+        [ serverPath ]);
+    serverProc.stderr.setEncoding('utf8');
+    serverProc.stderr.on('data', data => {
+        log(`AssistantServer: ${data.toString()}`);
+    });
 
     // TODO: Output logging from server's stderr to our logging mechanism in vscode.
 
