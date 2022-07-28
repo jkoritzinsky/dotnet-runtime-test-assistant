@@ -3,23 +3,25 @@ import * as rpc from 'vscode-jsonrpc/node';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { getRuntimeWorkspaceFolder } from './userPrompts';
-import * as os from "os";
+import * as os from 'os';
 import log from './log';
 
 export function setServerPathFromExtensionContext(context: vscode.ExtensionContext)
 {
-    serverPath = path.join(context.extensionUri.fsPath, "out", "server", "AssistantServer.dll");
+    serverPath = path.join(context.extensionUri.fsPath, 'out', 'server', 'AssistantServer.dll');
 }
 
 let serverPath: string = null!;
 
 let currentServerConnection: rpc.MessageConnection | null = null;
 
+let serverLog = vscode.window.createOutputChannel('dotnet-runtime-test-assistant Server');
+
 function getDotnetScriptExtension() {
-    if (os.platform() === "cygwin" || os.platform() === "win32") {
-        return ".cmd";
+    if (os.platform() === 'cygwin' || os.platform() === 'win32') {
+        return '.cmd';
     }
-    return ".sh";
+    return '.sh';
 }
 
 export async function getOrStartServerConnection(): Promise<rpc.MessageConnection | null>
@@ -40,12 +42,15 @@ export async function getOrStartServerConnection(): Promise<rpc.MessageConnectio
         [ serverPath ]);
     serverProc.stderr.setEncoding('utf8');
     serverProc.stderr.on('data', data => {
-        log(`AssistantServer: ${data.toString()}`);
+        serverLog.append(data.toString());
+    });
+    serverProc.on('close', exitCode => {
+        log(`Server exited with code '${exitCode}'`);
+        currentServerConnection!.dispose();
+        currentServerConnection = null;
     });
 
-    // TODO: Output logging from server's stderr to our logging mechanism in vscode.
-
-    log(`connecting to server (pid ${serverProc.pid})`);
+    log(`Connecting to server (pid ${serverProc.pid})`);
     let connection = rpc.createMessageConnection(
         new rpc.StreamMessageReader(serverProc.stdout),
         new rpc.StreamMessageWriter(serverProc.stdin),
@@ -53,6 +58,6 @@ export async function getOrStartServerConnection(): Promise<rpc.MessageConnectio
 
     connection.listen();
     currentServerConnection = connection;
-    log('connected to server');
+    log('Connected to server');
     return currentServerConnection;
 }

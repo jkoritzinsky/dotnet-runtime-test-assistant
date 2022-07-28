@@ -23,18 +23,20 @@
 		"onDebugResolve:rt-runtimetest",
 		"onDebugDynamicConfigurations:rt-runtimetest",
 		"onDebugResolve:rt-cg2corelib",
-		"onDebugDynamicConfigurations:rt-cg2corelib"
+		"onDebugDynamicConfigurations:rt-cg2corelib",
+		"onDebugResolve:rt-cg2rt",
+		"onDebugDynamicConfigurations:rt-cg2rt"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "dotnet-runtime-test-assistant.selectRuntimeTestPath",
-				"title": "Select runtime test path"
+				"title": "DN/RT-Test: Select runtime test path"
 			},
 			{
 				"command": "dotnet-runtime-test-assistant.startServerIfNotStarted",
-				"title": "Start the assistant server if it has not already been started."
+				"title": "DN/RT-Test: Start the assistant server."
 			}
 		],
 		"debuggers": [
@@ -72,6 +74,10 @@
 							"stopOnEntry": {
 								"type": "boolean",
 								"description": "Should the program pause as soon as Main is executed."
+							},
+							"separateConfig" : {
+								"type": "boolean",
+								"description": "Run crossgen2 against a System.Private.CoreLib of a different configuration."
 							}
 						}
 					}
@@ -83,6 +89,43 @@
 						"body": {
 							"name": "Launch Crossgen2 against System.Private.CoreLib",
 							"type": "rt-cg2corelib",
+							"request": "launch"
+						}
+					}
+				]
+			},
+			{
+				"type": "rt-cg2rt",
+				"label": "Debug running Crossgen2 on a runtime test",
+				"configurationAttributes": {
+					"launch": {
+						"properties": {
+							"stopOnEntry": {
+								"type": "boolean",
+								"description": "Should the program pause as soon as Main is executed."
+							},
+							"separateConfig" : {
+								"type": "boolean",
+								"description": "Run crossgen2 against a runtime test of a different configuration."
+							},
+							"composite" : {
+								"type": "boolean",
+								"description": "Run crossgen2 in composite mode."
+							},
+							"selectReferencedAssembly" : {
+								"type": "boolean",
+								"description": "Run crossgen2 against an assembly referenced by the runtime test or the runtime test, not only the runtime test itself."
+							}
+						}
+					}
+				},
+				"configurationSnippets": [
+					{
+						"label": "DN/RT-Assistant: Launch Crossgen2 against a runtime test",
+						"description": "A new configuration for running crossgen2 to generate native code for a runtime test.",
+						"body": {
+							"name": "Launch Crossgen2 against a runtime test",
+							"type": "rt-cg2rt",
 							"request": "launch"
 						}
 					}
