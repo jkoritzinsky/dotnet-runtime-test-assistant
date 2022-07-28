@@ -2,6 +2,14 @@
 	"name": "dotnet-runtime-test-assistant",
 	"displayName": "dotnet/runtime Test Assistant",
 	"description": "VSCode extension to assist in running tests in the dotnet/runtime GitHub repository from within VSCode with a debugger attached.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jkoritzinsky/dotnet-runtime-test-assistant"
+	},
+	"author": {
+		"name": "Jeremy Koritzinsky",
+		"url": "https://github.com/jkoritzinsky"
+	},
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.63.0"
@@ -11,6 +19,7 @@
 	],
 	"activationEvents": [
 		"onCommand:dotnet-runtime-test-assistant.selectRuntimeTestPath",
+		"onCommand:dotnet-runtime-test-assistant.startServerIfNotStarted",
 		"onDebugResolve:rt-runtimetest",
 		"onDebugDynamicConfigurations:rt-runtimetest",
 		"onDebugResolve:rt-cg2corelib",
@@ -22,16 +31,20 @@
 			{
 				"command": "dotnet-runtime-test-assistant.selectRuntimeTestPath",
 				"title": "Select runtime test path"
+			},
+			{
+				"command": "dotnet-runtime-test-assistant.startServerIfNotStarted",
+				"title": "Start the assistant server if it has not already been started."
 			}
 		],
-		"debuggers" :[
+		"debuggers": [
 			{
 				"type": "rt-runtimetest",
 				"label": "Debug runtime test",
 				"configurationAttributes": {
 					"launch": {
-						"properties" : {
-							"dotenvPath" : {
+						"properties": {
+							"dotenvPath": {
 								"type": "string",
 								"description": "A path to a .env file"
 							}
@@ -40,10 +53,10 @@
 				},
 				"configurationSnippets": [
 					{
-						"label" : "DN/RT-Assistant: Launch Runtime Test",
+						"label": "DN/RT-Assistant: Launch Runtime Test",
 						"description": "A new configuration for running a runtime test.",
-						"body" : {
-							"name" : "Launch Runtime Test",
+						"body": {
+							"name": "Launch Runtime Test",
 							"type": "rt-runtimetest",
 							"request": "launch"
 						}
@@ -55,8 +68,8 @@
 				"label": "Debug running Crossgen2 on System.Private.CoreLib",
 				"configurationAttributes": {
 					"launch": {
-						"properties" : {
-							"stopOnEntry" : {
+						"properties": {
+							"stopOnEntry": {
 								"type": "boolean",
 								"description": "Should the program pause as soon as Main is executed."
 							}
@@ -65,10 +78,10 @@
 				},
 				"configurationSnippets": [
 					{
-						"label" : "DN/RT-Assistant: Launch Crossgen2 against System.Private.CoreLib",
+						"label": "DN/RT-Assistant: Launch Crossgen2 against System.Private.CoreLib",
 						"description": "A new configuration for running crossgen2 to generate native code for System.Private.CoreLib.",
-						"body" : {
-							"name" : "Launch Crossgen2 against System.Private.CoreLib",
+						"body": {
+							"name": "Launch Crossgen2 against System.Private.CoreLib",
 							"type": "rt-cg2corelib",
 							"request": "launch"
 						}
@@ -78,15 +91,17 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
+		"vscode:prepublish": "npm run compile && npm run publish-server",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"publish-server": "dotnet publish ./src/server/AssistantServer.csproj -o out/server"
 	},
 	"dependencies": {
-		"glob": "^7.2.0"
+		"glob": "^7.2.0",
+		"vscode-jsonrpc": "^8.0.2"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.2.0",
