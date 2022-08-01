@@ -36,7 +36,7 @@
 			},
 			{
 				"command": "dotnet-runtime-test-assistant.startServerIfNotStarted",
-				"title": "DN/RT-Test: Start the assistant server."
+				"title": "DN/RT-Test: Start the assistant server"
 			}
 		],
 		"debuggers": [
@@ -49,6 +49,19 @@
 							"dotenvPath": {
 								"type": "string",
 								"description": "A path to a .env file"
+							},
+							"env" : {
+								"type": "object",
+								"additionalProperties": { "type": "string" },
+								"description" : "Environment variables to set for the target process"
+							},
+							"cwd" : {
+								"type": "string",
+								"description": "The working directory for the target process"
+							},
+							"stopAtEntry" : {
+								"type": "boolean",
+								"description": "true if the debugger should break as soon as the process is started."
 							}
 						}
 					}
@@ -71,13 +84,22 @@
 				"configurationAttributes": {
 					"launch": {
 						"properties": {
-							"stopOnEntry": {
-								"type": "boolean",
-								"description": "Should the program pause as soon as Main is executed."
-							},
 							"separateConfig" : {
 								"type": "boolean",
 								"description": "Run crossgen2 against a System.Private.CoreLib of a different configuration."
+							},
+							"env" : {
+								"type": "object",
+								"additionalProperties": { "type": "string" },
+								"description" : "Environment variables to set for the target process"
+							},
+							"cwd" : {
+								"type": "string",
+								"description": "The working directory for the target process"
+							},
+							"stopAtEntry" : {
+								"type": "boolean",
+								"description": "true if the debugger should break as soon as the process is started."
 							}
 						}
 					}
@@ -100,10 +122,6 @@
 				"configurationAttributes": {
 					"launch": {
 						"properties": {
-							"stopOnEntry": {
-								"type": "boolean",
-								"description": "Should the program pause as soon as Main is executed."
-							},
 							"separateConfig" : {
 								"type": "boolean",
 								"description": "Run crossgen2 against a runtime test of a different configuration."
@@ -115,6 +133,19 @@
 							"selectReferencedAssembly" : {
 								"type": "boolean",
 								"description": "Run crossgen2 against an assembly referenced by the runtime test or the runtime test, not only the runtime test itself."
+							},
+							"env" : {
+								"type": "object",
+								"additionalProperties": { "type": "string" },
+								"description" : "Environment variables to set for the target process"
+							},
+							"cwd" : {
+								"type": "string",
+								"description": "The working directory for the target process"
+							},
+							"stopAtEntry" : {
+								"type": "boolean",
+								"description": "true if the debugger should break as soon as the process is started."
 							}
 						}
 					}
@@ -133,6 +164,7 @@
 			}
 		]
 	},
+	"extensionDependencies": [ "ms-vscode.cpptools", "vadimcn.vscode-lldb" ],
 	"scripts": {
 		"vscode:prepublish": "npm run compile && npm run publish-server",
 		"compile": "tsc -p ./",

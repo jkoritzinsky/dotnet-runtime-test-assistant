@@ -60,7 +60,7 @@ function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, cor
         request: debugConfiguration.request,
         program: corerun,
         args: args,
-        stopAtEntry: debugConfiguration.stopAtEntry,
+        stopOnEntry: debugConfiguration.stopAtEntry,
         cwd: debugConfiguration.cwd ?? path.dirname(runtimeTest),
         env: debugConfiguration.env,
         initCommands: [ 'command source ~/.lldbinit' ]
