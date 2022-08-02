@@ -25,7 +25,9 @@
 		"onDebugResolve:rt-cg2corelib",
 		"onDebugDynamicConfigurations:rt-cg2corelib",
 		"onDebugResolve:rt-cg2rt",
-		"onDebugDynamicConfigurations:rt-cg2rt"
+		"onDebugDynamicConfigurations:rt-cg2rt",
+		"onDebugResolve:rt-libsnative",
+		"onDebugDynamicConfigurations:rt-libsnative"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -49,6 +51,14 @@
 							"dotenvPath": {
 								"type": "string",
 								"description": "A path to a .env file"
+							},
+							"args": {
+								"description": "Program arguments.",
+								"type": [
+									"array",
+									"string"
+								],
+								"default": []
 							},
 							"env" : {
 								"type": "object",
@@ -87,6 +97,14 @@
 							"separateConfig" : {
 								"type": "boolean",
 								"description": "Run crossgen2 against a System.Private.CoreLib of a different configuration."
+							},
+							"args": {
+								"description": "Program arguments.",
+								"type": [
+									"array",
+									"string"
+								],
+								"default": []
 							},
 							"env" : {
 								"type": "object",
@@ -134,6 +152,14 @@
 								"type": "boolean",
 								"description": "Run crossgen2 against an assembly referenced by the runtime test or the runtime test, not only the runtime test itself."
 							},
+							"args": {
+								"description": "Program arguments.",
+								"type": [
+									"array",
+									"string"
+								],
+								"default": []
+							},
 							"env" : {
 								"type": "object",
 								"additionalProperties": { "type": "string" },
@@ -157,6 +183,53 @@
 						"body": {
 							"name": "Launch Crossgen2 against a runtime test",
 							"type": "rt-cg2rt",
+							"request": "launch"
+						}
+					}
+				]
+			},
+			{
+				"type": "rt-libsnative",
+				"label": "Debug Libraries Test with Native Debugger",
+				"configurationAttributes": {
+					"launch": {
+						"properties": {
+							"outerloop" : {
+								"type" : "boolean",
+								"description": "Run outerloop tests",
+								"default" : false
+							},
+							"args": {
+								"description": "Program arguments.",
+								"type": [
+									"array",
+									"string"
+								],
+								"default": []
+							},
+							"env" : {
+								"type": "object",
+								"additionalProperties": { "type": "string" },
+								"description" : "Environment variables to set for the target process"
+							},
+							"cwd" : {
+								"type": "string",
+								"description": "The working directory for the target process"
+							},
+							"stopAtEntry" : {
+								"type": "boolean",
+								"description": "true if the debugger should break as soon as the process is started."
+							}
+						}
+					}
+				},
+				"configurationSnippets": [
+					{
+						"label": "DN/RT-Assistant: Launch Libraries Test With Native Debugger",
+						"description": "A new configuration for running a libraries test with a native debugger.",
+						"body": {
+							"name": "Launch Libraries Test with Native Debugger",
+							"type": "rt-libsnative",
 							"request": "launch"
 						}
 					}

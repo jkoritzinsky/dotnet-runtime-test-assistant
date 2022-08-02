@@ -28,7 +28,7 @@ function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration,
     }
     args.push(runtimeTest);
     if (debugConfiguration.args) {
-        args.concat(debugConfiguration.args);
+        args = args.concat(debugConfiguration.args);
     }
     return {
         name : debugConfiguration.name,
@@ -52,7 +52,7 @@ function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, cor
     }
     args.push(runtimeTest);
     if (debugConfiguration.args) {
-        args.concat(debugConfiguration.args);
+        args = args.concat(debugConfiguration.args);
     }
     return {
         name : debugConfiguration.name,

@@ -9,8 +9,8 @@ export const DEBUG_CONFIGURATION_TYPE : DebugConfigurationType = 'rt-cg2corelib'
 
 interface Crossgen2CoreLibConfiguration extends DebugConfigurationBase
 {
-    type: DebugConfigurationType,
-    separateConfig?: boolean
+    type: DebugConfigurationType;
+    separateConfig?: boolean;
 }
 
 function isCrossgen2CoreLibConfiguration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is Crossgen2CoreLibConfiguration

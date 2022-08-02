@@ -15,7 +15,7 @@ public class RpcService : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Log.Startup(logger, Environment.ProcessId);
+        logger.Startup(Environment.ProcessId);
 
         var rpc = JsonRpc.Attach(Console.OpenStandardOutput(), Console.OpenStandardInput(), new MSBuildRunner(logger));
 

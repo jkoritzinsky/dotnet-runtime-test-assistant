@@ -13,10 +13,10 @@ export const DEBUG_CONFIGURATION_TYPE : DebugConfigurationType = 'rt-cg2rt';
 
 interface Crossgen2Configuration extends DebugConfigurationBase
 {
-    type: DebugConfigurationType,
-    separateConfig?: boolean,
-    composite?: boolean,
-    selectReferencedAssembly?: boolean
+    type: DebugConfigurationType;
+    separateConfig?: boolean;
+    composite?: boolean;
+    selectReferencedAssembly?: boolean;
 }
 
 function isCrossgen2Configuration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is Crossgen2Configuration

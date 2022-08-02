@@ -6,6 +6,7 @@ import { existsSync } from 'fs';
 import * as os from 'os';
 import * as vscode from 'vscode';
 import { getRuntimeTestArtifactsPath } from './helpers';
+import { readdir } from 'fs/promises';
 
 export type OutputConfiguration = { os: string, arch:string, configuration: string };
 
@@ -121,17 +122,65 @@ export async function promptUserForRuntimeTest(options: { workspace: vscode.Uri,
     return await promptQuickPick(await getAllBuiltRuntimeTests(options.workspace, options.configuration), { title: 'Select a runtime test to run.' });
 }
 
-export async function promptQuickPick(values: string[], options: vscode.QuickPickOptions & { default? : string }) {
-	let items : vscode.QuickPickItem[] = [];
+interface LibrariesTestInfo {
+	projectName: string;
+	tfm: string;
+	projectPath: string;
+}
 
-	values.forEach(value => {
-		if (value === options.default) {
-			items = [ { label: value, description: '(default)' }, ...items ];
-		} else {
-			items.push({ label: value });
+async function getAllBuiltLibrariesTests(workspaceFolder: vscode.Uri, configuration: OutputConfiguration) : Promise<LibrariesTestInfo[]> {
+	const artifactsBin = path.join(workspaceFolder.fsPath, 'artifacts', 'bin');
+	let librariesTestProjects = await promisify(glob)(path.join(`${workspaceFolder.fsPath}`, 'src', 'libraries', '*', 'tests', '**/*.Tests.csproj'));
+	let bulitLibrariesTests: LibrariesTestInfo[] = [];
+	for (const librariesTestProject of librariesTestProjects) {
+		let projectName = path.basename(librariesTestProject, '.csproj');
+		let projectBin = path.join(artifactsBin, projectName, configuration.configuration);
+		if (existsSync(projectBin)) {
+			let builtTfms = await readdir(projectBin);
+			bulitLibrariesTests = bulitLibrariesTests.concat(builtTfms.map(tfm => {
+				return {
+					projectName,
+					tfm,
+					projectPath: librariesTestProject
+				};
+			}));
 		}
-	});
+	}
+	return bulitLibrariesTests;
+}
 
-	let result = await vscode.window.showQuickPick(items, options);
+export async function promptUserForLibrariesTest(options: { workspace: vscode.Uri, configuration : OutputConfiguration }) {
+	const librariesTestProjects = await getAllBuiltLibrariesTests(options.workspace, options.configuration);
+	let result = await vscode.window.showQuickPick(createQuickPickItems(librariesTestProjects, project => {
+		return {
+			label: project.projectName,
+			description: `(${project.tfm})`,
+			originalData: project
+		};
+	}), { title: 'Select a libaries test assembly to run.', matchOnDescription: true });
+
+	if (result === undefined) {
+		return result;
+	}
+
+	return result.originalData;
+}
+
+function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (value: T) => vscode.QuickPickItem & TAdditionalProperties, defaultValue? : T) {
+	return values.map(item => {
+		let quickPick = factory(item);
+		if (defaultValue === item) {
+			if (quickPick.description) {
+				quickPick.description += ' (default)';
+			} else {
+				quickPick.description = '(default)';
+			}
+		}
+		return quickPick;
+	});
+}
+
+export async function promptQuickPick(values: string[], options: vscode.QuickPickOptions & { default? : string }) {
+	let result = await vscode.window.showQuickPick(createQuickPickItems(values, value => { return { label: value }; }, options.default), options);
 	return result?.label;
 }

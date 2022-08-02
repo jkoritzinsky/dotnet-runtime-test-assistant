@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as runtimeTestProvider from './providers/runtimetest';
 import * as crossgen2CoreLibTestProvider from './providers/crossgen2-corelib';
 import * as crossgen2TestProvider from './providers/crossgen2';
+import * as libsNativeTestProvider from './providers/libs-native';
 import * as userPrompts from './userPrompts';
 import { setServerPathFromExtensionContext, getOrStartServerConnection } from './server';
 
@@ -30,6 +31,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(crossgen2CoreLibTestProvider.DEBUG_CONFIGURATION_TYPE, crossgen2CoreLibTestProvider));
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(crossgen2TestProvider.DEBUG_CONFIGURATION_TYPE, crossgen2TestProvider, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(crossgen2TestProvider.DEBUG_CONFIGURATION_TYPE, crossgen2TestProvider));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(libsNativeTestProvider.DEBUG_CONFIGURATION_TYPE, libsNativeTestProvider, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(libsNativeTestProvider.DEBUG_CONFIGURATION_TYPE, libsNativeTestProvider));
 	
 	setServerPathFromExtensionContext(context);
 }

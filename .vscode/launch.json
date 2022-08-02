@@ -6,11 +6,6 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": ".NET Core Attach",
-			"type": "coreclr",
-			"request": "attach"
-		},
-		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
@@ -21,6 +16,11 @@
 				"${workspaceFolder}/out/**/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
+		},
+		{
+			"name": ".NET Core Attach",
+			"type": "coreclr",
+			"request": "attach"
 		},
 		{
 			"name": "Extension Tests",

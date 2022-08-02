@@ -5,6 +5,7 @@ import * as path from 'path';
 import { getRuntimeWorkspaceFolder } from './userPrompts';
 import * as os from 'os';
 import log from './log';
+import { ParameterStructures, RequestHandler, RequestType2 } from 'vscode-jsonrpc/node';
 
 export function setServerPathFromExtensionContext(context: vscode.ExtensionContext)
 {
@@ -24,8 +25,7 @@ function getDotnetScriptExtension() {
     return '.sh';
 }
 
-export async function getOrStartServerConnection(): Promise<rpc.MessageConnection | null>
-{
+export async function getOrStartServerConnection(): Promise<rpc.MessageConnection> {
     if (currentServerConnection !== null) {
         return currentServerConnection;
     }
@@ -34,7 +34,7 @@ export async function getOrStartServerConnection(): Promise<rpc.MessageConnectio
     let runtimeWorkspaceFolder = await getRuntimeWorkspaceFolder();
     if (!runtimeWorkspaceFolder) {
         log('unable to start server when no dotnet/runtime workspace is open');
-        return null;
+        throw new Error('Unable to use the assistant server when no dotnet/runtime workspace is open.');
     }
     log(`starting server process at path: '${serverPath}'`);
     let serverProc = cp.spawn(
@@ -60,4 +60,30 @@ export async function getOrStartServerConnection(): Promise<rpc.MessageConnectio
     currentServerConnection = connection;
     log('Connected to server');
     return currentServerConnection;
+}
+
+namespace Protocol {
+
+    export namespace GetProjectProperties {
+        export const method = 'GetProjectProperties';
+
+        type Response<TProperties extends string[]> = {
+            [key in TProperties[number]]: string;
+        };
+
+        export function getRequestType<TProperties extends string[]>()
+        {
+            return new RequestType2<string, TProperties, Response<TProperties>, void>(method);
+        }
+    }
+}
+
+export async function getProjectProperties<TProperty extends string>(projectFilePath: string, ...properties: TProperty[]) {
+    const serverConnection = await getOrStartServerConnection();
+    return await serverConnection.sendRequest(Protocol.GetProjectProperties.getRequestType<TProperty[]>(), projectFilePath,  properties);
+}
+
+export async function getNetCoreAppCurrentProperty() {
+    const runtimeWorkspaceFolder = await getRuntimeWorkspaceFolder();
+    return (await getProjectProperties(path.join(runtimeWorkspaceFolder!.fsPath, 'Build.proj'), 'NetCoreAppCurrent')).NetCoreAppCurrent;
 }
