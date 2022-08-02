@@ -5,10 +5,9 @@ import * as path from 'path';
 import { getRuntimeWorkspaceFolder } from './userPrompts';
 import * as os from 'os';
 import log from './log';
-import { ParameterStructures, RequestHandler, RequestType2 } from 'vscode-jsonrpc/node';
+import { RequestType2 } from 'vscode-jsonrpc/node';
 
-export function setServerPathFromExtensionContext(context: vscode.ExtensionContext)
-{
+export function setServerPathFromExtensionContext(context: vscode.ExtensionContext) {
     serverPath = path.join(context.extensionUri.fsPath, 'out', 'server', 'AssistantServer.dll');
 }
 
@@ -71,8 +70,7 @@ namespace Protocol {
             [key in TProperties[number]]: string;
         };
 
-        export function getRequestType<TProperties extends string[]>()
-        {
+        export function getRequestType<TProperties extends string[]>() {
             return new RequestType2<string, TProperties, Response<TProperties>, void>(method);
         }
     }

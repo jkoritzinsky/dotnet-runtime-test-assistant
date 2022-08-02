@@ -14,13 +14,11 @@ interface RuntimeTestConfiguration extends DebugConfigurationBase
     dotenvPath?: string,
 }
 
-function isRuntimeTestConfiguration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is RuntimeTestConfiguration
-{
+function isRuntimeTestConfiguration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is RuntimeTestConfiguration {
     return debugConfiguration.type === DEBUG_CONFIGURATION_TYPE;
 }
 
-function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration, corerun: string, runtimeTest: string): vscode.DebugConfiguration
-{
+function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration, corerun: string, runtimeTest: string): vscode.DebugConfiguration {
     let args: string[] = [];
     if (debugConfiguration.dotenvPath) {
         args.push('-e');
@@ -43,8 +41,7 @@ function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration,
     };
 }
 
-function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, corerun: string, runtimeTest: string): vscode.DebugConfiguration
-{
+function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, corerun: string, runtimeTest: string): vscode.DebugConfiguration {
     let args: string[] = [];
     if (debugConfiguration.dotenvPath) {
         args.push('-e');
@@ -67,8 +64,7 @@ function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, cor
     };
 }
 
-export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]>
-{
+export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     return [
         {
             type: DEBUG_CONFIGURATION_TYPE,
@@ -81,8 +77,7 @@ export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | und
     ];
 }
 
-export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration, _token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration | undefined>
-{
+export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration, _token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration | undefined> {
     if (isRuntimeTestConfiguration(debugConfiguration)) {
         if (!folder) {
             return undefined;

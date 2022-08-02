@@ -9,18 +9,16 @@ import { existsSync } from "fs";
 
 type DebugConfigurationType = 'rt-cg2rt';
 
-export const DEBUG_CONFIGURATION_TYPE : DebugConfigurationType = 'rt-cg2rt';
+export const DEBUG_CONFIGURATION_TYPE: DebugConfigurationType = 'rt-cg2rt';
 
-interface Crossgen2Configuration extends DebugConfigurationBase
-{
+interface Crossgen2Configuration extends DebugConfigurationBase {
     type: DebugConfigurationType;
     separateConfig?: boolean;
     composite?: boolean;
     selectReferencedAssembly?: boolean;
 }
 
-function isCrossgen2Configuration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is Crossgen2Configuration
-{
+function isCrossgen2Configuration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is Crossgen2Configuration {
     return debugConfiguration.type === DEBUG_CONFIGURATION_TYPE;
 }
 
@@ -35,8 +33,7 @@ async function writeResponseFile(responseFilePath: string, coreRoot: string, tar
     if (composite) {
         rsp += `${path.join(inputFolder, '*.dll')}\n`;
         rsp += `-o:${path.join(path.dirname(runtimeTest), 'composite-r2r.dll')}\n`;
-    }
-    else {
+    } else {
         rsp += `${path.join(inputFolder, path.basename(runtimeTest))}\n`;
         rsp += `-o:${runtimeTest}\n`;
     }
@@ -53,11 +50,10 @@ async function writeResponseFile(responseFilePath: string, coreRoot: string, tar
     await writeFile(responseFilePath, rsp);
 }
 
-export function transformConfig(debugConfiguration: Crossgen2Configuration, crossgenBuildCoreClrBin: string, responseFilePath: string, ...extraArgs: string[])
-{
+export function transformConfig(debugConfiguration: Crossgen2Configuration, crossgenBuildCoreClrBin: string, responseFilePath: string, ...extraArgs: string[]) {
     return {
-        name : debugConfiguration.name,
-        type : 'coreclr',
+        name: debugConfiguration.name,
+        type: 'coreclr',
         request: 'launch',
         program: path.join(crossgenBuildCoreClrBin, 'crossgen2', 'crossgen2.dll'),
         args: [
@@ -67,8 +63,7 @@ export function transformConfig(debugConfiguration: Crossgen2Configuration, cros
     };
 }
 
-export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]>
-{
+export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     return [
         {
             type: DEBUG_CONFIGURATION_TYPE,
@@ -81,8 +76,7 @@ export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | und
     ];
 }
 
-export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration, _token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration | undefined>
-{
+export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration, _token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration | undefined> {
     if (isCrossgen2Configuration(debugConfiguration)) {
         if (!folder) {
             return undefined;
@@ -91,8 +85,7 @@ export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder |
         let testConfig: userPrompts.OutputConfiguration | undefined;
         if (debugConfiguration.separateConfig) {
             crossgen2Config = await userPrompts.promptUserForTargetConfiguration({ promptPrefix: 'Crossgen2', showChecked: true, defaultConfiguration: 'Debug' });
-            if (crossgen2Config)
-            {
+            if (crossgen2Config) {
                 testConfig = await userPrompts.promptUserForTargetConfiguration({ promptPrefix: 'Runtime Test', showChecked: true, defaultConfiguration: 'Debug', showAllOSChoices: true });
             }
         } else {
@@ -105,7 +98,7 @@ export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder |
         let artifactPath = getRuntimeTestArtifactsPath(folder.uri, testConfig);
         let runtimeTest = await userPrompts.promptUserForRuntimeTest({ workspace: folder.uri, configuration: testConfig });
 
-        if (!runtimeTest) { 
+        if (!runtimeTest) {
             return undefined;
         }
 

@@ -14,13 +14,11 @@ interface RuntimeTestConfiguration extends DebugConfigurationBase
     outerloop?: boolean;
 }
 
-function isLibsNativeTestConfiguration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is RuntimeTestConfiguration
-{
+function isLibsNativeTestConfiguration(debugConfiguration: vscode.DebugConfiguration): debugConfiguration is RuntimeTestConfiguration {
     return debugConfiguration.type === DEBUG_CONFIGURATION_TYPE;
 }
 
-function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration, dotnet: string, cwd: string, args: string[]): vscode.DebugConfiguration
-{
+function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration, dotnet: string, cwd: string, args: string[]): vscode.DebugConfiguration {
     if (debugConfiguration.args) {
         args = args.concat(debugConfiguration.args);
     }
@@ -37,8 +35,7 @@ function transformToCppvsdbgConfig(debugConfiguration: RuntimeTestConfiguration,
     };
 }
 
-function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, dotnet: string, cwd: string, args: string[]): vscode.DebugConfiguration
-{
+function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, dotnet: string, cwd: string, args: string[]): vscode.DebugConfiguration {
     if (debugConfiguration.args) {
         args = args.concat(debugConfiguration.args);
     }
@@ -55,8 +52,7 @@ function transformToLLDBConfig(debugConfiguration: RuntimeTestConfiguration, dot
     };
 }
 
-export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]>
-{
+export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     return [
         {
             type: DEBUG_CONFIGURATION_TYPE,
@@ -69,8 +65,7 @@ export function provideDebugConfigurations(_folder: vscode.WorkspaceFolder | und
     ];
 }
 
-export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration, _token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration | undefined>
-{
+export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, debugConfiguration: vscode.DebugConfiguration, _token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration | undefined> {
     if (isLibsNativeTestConfiguration(debugConfiguration)) {
         if (!folder) {
             return undefined;

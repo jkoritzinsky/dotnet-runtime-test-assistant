@@ -30,8 +30,7 @@ function getDefaultOSOption() {
 
 export async function promptUserForTargetConfiguration(options: { promptPrefix: string, showChecked: boolean, defaultConfiguration: string, showAllOSChoices?: boolean }): Promise<OutputConfiguration | undefined> {
 	let targetOS : string;
-	if (options.showAllOSChoices)
-	{
+	if (options.showAllOSChoices) {
 		let userInputTarget = await promptQuickPick([ 'windows', 'Linux', 'OSX', 'FreeBSD', 'SunOS' ], { title: `${options.promptPrefix} OS`, default: getDefaultOSOption() });
 		if (!userInputTarget) {
 			return undefined;
@@ -100,7 +99,9 @@ export async function getRuntimeWorkspaceFolder() {
 		return workspaceFolders[0].uri;
 	}
 
-	let options = workspaceFolders.map(folder => { return { label: folder.name, detail: folder.uri.toString() }; });
+	let options = workspaceFolders.map(folder => {
+ return { label: folder.name, detail: folder.uri.toString() }; 
+});
 
 	let result = await vscode.window.showQuickPick(options, { title: 'Select dotnet/runtime workspace...' });
 	return result === undefined ? undefined : vscode.Uri.parse(result.detail);
@@ -181,6 +182,8 @@ function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (v
 }
 
 export async function promptQuickPick(values: string[], options: vscode.QuickPickOptions & { default? : string }) {
-	let result = await vscode.window.showQuickPick(createQuickPickItems(values, value => { return { label: value }; }, options.default), options);
+	let result = await vscode.window.showQuickPick(createQuickPickItems(values, value => {
+ return { label: value }; 
+}, options.default), options);
 	return result?.label;
 }

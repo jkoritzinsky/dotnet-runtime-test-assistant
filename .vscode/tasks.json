@@ -11,7 +11,7 @@
 			"isBackground": true,
 			"presentation": {
 				"reveal": "never",
-				"group" : "buildWatchers",
+				"group": "buildWatchers",
 				"close": false
 			},
 			"group": {
@@ -26,14 +26,14 @@
 				"base": "$msCompile",
 				"applyTo": "allDocuments",
 				"background": {
-					"beginsPattern" : "Started",
+					"beginsPattern": "Started",
 					"endsPattern": "Waiting for a file to change before restarting dotnet"
 				}
 			},
 			"isBackground": true,
 			"presentation": {
 				"reveal": "never",
-				"group" : "buildWatchers",
+				"group": "buildWatchers",
 				"close": false
 			},
 			"group": {
@@ -64,6 +64,6 @@
 				"isDefault": true
 			},
 			"problemMatcher": []
-		},
+		}
 	]
 }
