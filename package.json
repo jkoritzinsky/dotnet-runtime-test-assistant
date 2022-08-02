@@ -172,7 +172,8 @@
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
-		"publish-server": "dotnet publish ./src/server/AssistantServer.csproj -o out/server"
+		"publish-server": "dotnet publish ./src/server/AssistantServer.csproj -o out/server",
+		"watch-server" : "dotnet watch --no-hot-reload --project ./src/server/AssistantServer.csproj publish -o out/server"
 	},
 	"dependencies": {
 		"glob": "^7.2.0",

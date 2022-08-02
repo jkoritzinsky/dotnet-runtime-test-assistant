@@ -4,29 +4,53 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "Extension - Build",
 			"type": "npm",
 			"script": "watch",
 			"problemMatcher": "$tsc-watch",
 			"isBackground": true,
 			"presentation": {
-				"reveal": "never"
+				"reveal": "never",
+				"group" : "buildWatchers",
+				"close": false
 			},
 			"group": {
 				"kind": "build",
-				"isDefault": true
 			}
 		},
 		{
+			"label": "Server - Build",
 			"type": "npm",
-			"script": "publish-server",
-			"problemMatcher": "$msCompile",
-			"isBackground": false,
+			"script": "watch-server",
+			"problemMatcher": {
+				"base": "$msCompile",
+				"applyTo": "allDocuments",
+				"background": {
+					"beginsPattern" : "Started",
+					"endsPattern": "Waiting for a file to change before restarting dotnet"
+				}
+			},
+			"isBackground": true,
 			"presentation": {
-				"reveal": "never"
+				"reveal": "never",
+				"group" : "buildWatchers",
+				"close": false
 			},
 			"group": {
 				"kind": "build"
 			}
-		}
+		},
+		{
+			"label": "Build",
+			"dependsOn": [
+				"Extension - Build",
+				"Server - Build"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		},
 	]
 }
