@@ -1,8 +1,8 @@
-import * as path from "path";
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as userPrompts from '../userPrompts';
 import { DebugConfigurationBase, transformEnvBlock, getLibrariesTestHostPath, getArtifactsBinPath } from '../helpers';
-import { getNetCoreAppCurrentProperty, getProjectProperties } from "../server";
+import { getNetCoreAppCurrentProperty, getProjectProperties } from '../server';
 
 type DebugConfigurationType = 'rt-libsnative';
 

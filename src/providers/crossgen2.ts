@@ -1,11 +1,11 @@
-import * as path from "path";
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as userPrompts from '../userPrompts';
 import { DebugConfigurationBase, getCoreClrOutputRootPath, getRuntimeTestArtifactsPath } from '../helpers';
-import { copyFile, writeFile, mkdir } from "fs/promises";
-import { promisify } from "util";
-import { glob } from "glob";
-import { existsSync } from "fs";
+import { copyFile, writeFile, mkdir } from 'fs/promises';
+import { promisify } from 'util';
+import { glob } from 'glob';
+import { existsSync } from 'fs';
 
 type DebugConfigurationType = 'rt-cg2rt';
 
@@ -40,10 +40,10 @@ async function writeResponseFile(responseFilePath: string, coreRoot: string, tar
     rsp += `-r:${coreRoot}/System.*.dll\n`;
     rsp += `-r:${coreRoot}/Microsoft.*.dll\n`;
     rsp += `-r:${coreRoot}/mscorlib.dll\n`;
-    rsp += `--verify-type-and-field-layout\n`;
-    rsp += `--method-layout:random\n`;
+    rsp += '--verify-type-and-field-layout\n';
+    rsp += '--method-layout:random\n';
     rsp += `--targetarch:${targetArch}\n`;
-    rsp += `-O\n`;
+    rsp += '-O\n';
     if (composite) {
         rsp += '-composite\n';
     }

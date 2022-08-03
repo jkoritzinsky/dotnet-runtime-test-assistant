@@ -1,5 +1,5 @@
-import { debug } from "console";
-import * as path from "path";
+import { debug } from 'console';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as userPrompts from '../userPrompts';
 import { transformEnvBlock, getRuntimeTestArtifactsPath, DebugConfigurationBase } from '../helpers';

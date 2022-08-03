@@ -15,7 +15,14 @@
         "eqeqeq": "warn",
         "no-throw-literal": "warn",
         "semi": "error",
-        "brace-style": "error"
+        "brace-style": "error",
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ]
     },
     "ignorePatterns": [
         "out",

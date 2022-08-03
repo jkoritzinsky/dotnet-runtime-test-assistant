@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as userPrompts from '../userPrompts';
 import { DebugConfigurationBase, getCoreClrOutputRootPath } from '../helpers';
