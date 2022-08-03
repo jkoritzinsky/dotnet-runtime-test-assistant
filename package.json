@@ -18,6 +18,7 @@
 		"Other"
 	],
 	"activationEvents": [
+		"onCommand:dotnet-runtime-test-assistant.importSettingsFromDevContainer",
 		"onCommand:dotnet-runtime-test-assistant.startServerIfNotStarted",
 		"onDebugResolve:rt-runtimetest",
 		"onDebugDynamicConfigurations:rt-runtimetest",
@@ -34,6 +35,10 @@
 			{
 				"command": "dotnet-runtime-test-assistant.startServerIfNotStarted",
 				"title": "DN/RT-Test: Start the assistant server"
+			},
+			{
+				"command": "dotnet-runtime-test-assistant.importSettingsFromDevContainer",
+				"title": "DN/RT-Test: Import settings from .devcontainer file"
 			}
 		],
 		"debuggers": [
@@ -257,6 +262,7 @@
 	},
 	"dependencies": {
 		"glob": "^7.2.0",
+		"jsonc-parser": "^3.1.0",
 		"vscode-jsonrpc": "^8.0.2"
 	},
 	"devDependencies": {
