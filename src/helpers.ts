@@ -1,7 +1,7 @@
 
 import * as path from 'path';
 import { DebugConfiguration, Uri } from 'vscode';
-import { OutputConfiguration } from './userPrompts';
+import { OutputConfiguration } from './outputConfiguration';
 
 export function transformEnvBlock(env: { [key: string]: string }): { key: string, value: string }[] {
     let result = [];

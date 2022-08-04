@@ -1,14 +1,13 @@
 
 import * as glob from 'glob';
 import * as path from 'path';
-import {promisify} from 'util';
+import { promisify } from 'util';
 import { existsSync } from 'fs';
 import * as os from 'os';
 import * as vscode from 'vscode';
 import { getRuntimeTestArtifactsPath } from './helpers';
 import { readdir } from 'fs/promises';
-
-export type OutputConfiguration = { os: string, arch:string, configuration: string };
+import { OutputConfiguration } from './outputConfiguration';
 
 function getDefaultOSOption() {
 	switch (os.platform()) {
@@ -29,9 +28,9 @@ function getDefaultOSOption() {
 }
 
 export async function promptUserForTargetConfiguration(options: { promptPrefix: string, showChecked: boolean, defaultConfiguration: string, showAllOSChoices?: boolean }): Promise<OutputConfiguration | undefined> {
-	let targetOS : string;
+	let targetOS: string;
 	if (options.showAllOSChoices) {
-		let userInputTarget = await promptQuickPick([ 'windows', 'Linux', 'OSX', 'FreeBSD', 'SunOS' ], { title: `${options.promptPrefix} OS`, default: getDefaultOSOption() });
+		let userInputTarget = await promptQuickPick(['windows', 'Linux', 'OSX', 'FreeBSD', 'SunOS'], { title: `${options.promptPrefix} OS`, default: getDefaultOSOption() });
 		if (!userInputTarget) {
 			return undefined;
 		}
@@ -64,7 +63,7 @@ export async function promptUserForTargetConfiguration(options: { promptPrefix: 
 			break;
 	}
 
-	let targetArch = await promptQuickPick([ 'x86', 'x64', 'arm', 'arm64', 's390x' ], { title: `${options.promptPrefix} Architecture`, default: os.arch() });
+	let targetArch = await promptQuickPick(['x86', 'x64', 'arm', 'arm64', 's390x'], { title: `${options.promptPrefix} Architecture`, default: os.arch() });
 
 	if (!targetArch) {
 		return undefined;
@@ -100,8 +99,8 @@ export async function getRuntimeWorkspaceFolder() {
 	}
 
 	let options = workspaceFolders.map(folder => {
- return { label: folder.name, detail: folder.uri.toString() }; 
-});
+		return { label: folder.name, detail: folder.uri.toString() };
+	});
 
 	let result = await vscode.window.showQuickPick(options, { title: 'Select dotnet/runtime workspace...' });
 	return result === undefined ? undefined : vscode.Uri.parse(result.detail);
@@ -119,8 +118,8 @@ async function getAllBuiltRuntimeTests(workspaceFolder: vscode.Uri, configuratio
 	}).filter(testEntryPoint => existsSync(`${testPathRoot}${path.sep}${testEntryPoint}`));
 }
 
-export async function promptUserForRuntimeTest(options: { workspace: vscode.Uri, configuration : OutputConfiguration }) {
-    return await promptQuickPick(await getAllBuiltRuntimeTests(options.workspace, options.configuration), { title: 'Select a runtime test to run.' });
+export async function promptUserForRuntimeTest(options: { workspace: vscode.Uri, configuration: OutputConfiguration }) {
+	return await promptQuickPick(await getAllBuiltRuntimeTests(options.workspace, options.configuration), { title: 'Select a runtime test to run.' });
 }
 
 interface LibrariesTestInfo {
@@ -129,7 +128,7 @@ interface LibrariesTestInfo {
 	projectPath: string;
 }
 
-async function getAllBuiltLibrariesTests(workspaceFolder: vscode.Uri, configuration: OutputConfiguration) : Promise<LibrariesTestInfo[]> {
+async function getAllBuiltLibrariesTests(workspaceFolder: vscode.Uri, configuration: OutputConfiguration): Promise<LibrariesTestInfo[]> {
 	const artifactsBin = path.join(workspaceFolder.fsPath, 'artifacts', 'bin');
 	let librariesTestProjects = await promisify(glob)(path.join(`${workspaceFolder.fsPath}`, 'src', 'libraries', '*', 'tests', '**/*.Tests.csproj'));
 	let bulitLibrariesTests: LibrariesTestInfo[] = [];
@@ -150,7 +149,7 @@ async function getAllBuiltLibrariesTests(workspaceFolder: vscode.Uri, configurat
 	return bulitLibrariesTests;
 }
 
-export async function promptUserForLibrariesTest(options: { workspace: vscode.Uri, configuration : OutputConfiguration }) {
+export async function promptUserForLibrariesTest(options: { workspace: vscode.Uri, configuration: OutputConfiguration }) {
 	const librariesTestProjects = await getAllBuiltLibrariesTests(options.workspace, options.configuration);
 	let result = await vscode.window.showQuickPick(createQuickPickItems(librariesTestProjects, project => {
 		return {
@@ -167,8 +166,9 @@ export async function promptUserForLibrariesTest(options: { workspace: vscode.Ur
 	return result.originalData;
 }
 
-function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (value: T) => vscode.QuickPickItem & TAdditionalProperties, defaultValue? : T) {
-	return values.map(item => {
+function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (value: T) => vscode.QuickPickItem & TAdditionalProperties, defaultValue?: T) {
+	let defaultQuickPick: vscode.QuickPickItem | undefined = undefined;
+	let quickPickItems = values.map(item => {
 		let quickPick = factory(item);
 		if (defaultValue === item) {
 			if (quickPick.description) {
@@ -176,14 +176,17 @@ function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (v
 			} else {
 				quickPick.description = '(default)';
 			}
+			defaultQuickPick = quickPick;
 		}
 		return quickPick;
 	});
+
+	return defaultQuickPick === undefined ? quickPickItems : [defaultQuickPick, ...quickPickItems.filter(item => item !== defaultQuickPick)];
 }
 
-export async function promptQuickPick(values: string[], options: vscode.QuickPickOptions & { default? : string }) {
+export async function promptQuickPick(values: string[], options: vscode.QuickPickOptions & { default?: string }) {
 	let result = await vscode.window.showQuickPick(createQuickPickItems(values, value => {
- return { label: value }; 
-}, options.default), options);
+		return { label: value };
+	}, options.default), options);
 	return result?.label;
 }

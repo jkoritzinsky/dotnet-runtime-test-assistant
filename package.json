@@ -18,8 +18,9 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:dotnet-runtime-test-assistant.importSettingsFromDevContainer",
 		"onCommand:dotnet-runtime-test-assistant.startServerIfNotStarted",
+		"onCommand:dotnet-runtime-test-assistant.importSettingsFromDevContainer",
+		"onCommand:dotnet-runtime-test-assistant.configureRunSettingsFileForTestRun",
 		"onDebugResolve:rt-runtimetest",
 		"onDebugDynamicConfigurations:rt-runtimetest",
 		"onDebugResolve:rt-cg2corelib",
@@ -39,6 +40,10 @@
 			{
 				"command": "dotnet-runtime-test-assistant.importSettingsFromDevContainer",
 				"title": "DN/RT-Test: Import settings from .devcontainer file"
+			},
+			{
+				"command": "dotnet-runtime-test-assistant.configureRunSettingsFileForTestRun",
+				"title": "DN/RT-Test: Configure the .runsettings file for running tests in VSCode"
 			}
 		],
 		"debuggers": [

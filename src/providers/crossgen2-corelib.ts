@@ -2,13 +2,13 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as userPrompts from '../userPrompts';
 import { DebugConfigurationBase, getCoreClrOutputRootPath } from '../helpers';
+import { OutputConfiguration } from '../outputConfiguration';
 
 type DebugConfigurationType = 'rt-cg2corelib';
 
-export const DEBUG_CONFIGURATION_TYPE : DebugConfigurationType = 'rt-cg2corelib';
+export const DEBUG_CONFIGURATION_TYPE: DebugConfigurationType = 'rt-cg2corelib';
 
-interface Crossgen2CoreLibConfiguration extends DebugConfigurationBase
-{
+interface Crossgen2CoreLibConfiguration extends DebugConfigurationBase {
     type: DebugConfigurationType;
     separateConfig?: boolean;
 }
@@ -19,8 +19,8 @@ function isCrossgen2CoreLibConfiguration(debugConfiguration: vscode.DebugConfigu
 
 export function transformConfigForCoreLib(debugConfiguration: Crossgen2CoreLibConfiguration, crossgenBuildCoreClrBin: string, corelibBuildCoreClrBin: string, targetArch: string) {
     return {
-        name : debugConfiguration.name,
-        type : 'coreclr',
+        name: debugConfiguration.name,
+        type: 'coreclr',
         request: 'launch',
         program: path.join(crossgenBuildCoreClrBin, 'crossgen2', 'crossgen2.dll'),
         args: [
@@ -51,8 +51,8 @@ export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder |
         if (!folder) {
             return undefined;
         }
-        let crossgen2Config: userPrompts.OutputConfiguration | undefined;
-        let corelibConfig: userPrompts.OutputConfiguration | undefined;
+        let crossgen2Config: OutputConfiguration | undefined;
+        let corelibConfig: OutputConfiguration | undefined;
         if (debugConfiguration.separateConfig) {
             crossgen2Config = await userPrompts.promptUserForTargetConfiguration({ promptPrefix: 'Crossgen2', showChecked: true, defaultConfiguration: 'Debug' });
             if (crossgen2Config) {

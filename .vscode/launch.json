@@ -23,6 +23,17 @@
 			"request": "attach"
 		},
 		{
+			"name": "Launch Assistant Server",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "Server - Single Build",
+			"program": "${workspaceFolder}/out/server/AssistantServer.dll",
+			"args": [],
+			"cwd": "${workspaceFolder}/out",
+			"stopAtEntry": true,
+			"console": "internalConsole",
+		},
+		{
 			"name": "Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",

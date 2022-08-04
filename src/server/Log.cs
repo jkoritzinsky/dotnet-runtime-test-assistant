@@ -24,4 +24,11 @@ internal static partial class Log
         Message = "Getting properties '{properties}' from project file '{projectFile}'."
     )]
     public static partial void GetProjectProperties(this ILogger logger, string projectFile, string[] properties);
+
+    [LoggerMessage(
+        EventId = 3,
+        Level = LogLevel.Information,
+        Message = "MSBuild: {message}"
+    )]
+    public static partial void LogMSBuildOutput(this ILogger logger, string message);
 }

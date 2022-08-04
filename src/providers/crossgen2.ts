@@ -6,6 +6,7 @@ import { copyFile, writeFile, mkdir } from 'fs/promises';
 import { promisify } from 'util';
 import { glob } from 'glob';
 import { existsSync } from 'fs';
+import { OutputConfiguration } from '../outputConfiguration';
 
 type DebugConfigurationType = 'rt-cg2rt';
 
@@ -81,8 +82,8 @@ export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder |
         if (!folder) {
             return undefined;
         }
-        let crossgen2Config: userPrompts.OutputConfiguration | undefined;
-        let testConfig: userPrompts.OutputConfiguration | undefined;
+        let crossgen2Config: OutputConfiguration | undefined;
+        let testConfig: OutputConfiguration | undefined;
         if (debugConfiguration.separateConfig) {
             crossgen2Config = await userPrompts.promptUserForTargetConfiguration({ promptPrefix: 'Crossgen2', showChecked: true, defaultConfiguration: 'Debug' });
             if (crossgen2Config) {

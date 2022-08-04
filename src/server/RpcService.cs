@@ -17,6 +17,7 @@ public class RpcService : BackgroundService
     {
         logger.Startup(Environment.ProcessId);
 
+        MSBuildLocatorRegistration.Register();
         var rpc = JsonRpc.Attach(Console.OpenStandardOutput(), Console.OpenStandardInput(), new MSBuildRunner(logger));
 
         stoppingToken.Register(() => rpc.Dispose());

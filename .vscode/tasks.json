@@ -41,6 +41,7 @@
 			}
 		},
 		{
+			"label": "Server - Single Build",
 			"type": "npm",
 			"script": "publish-server",
 			"problemMatcher": "$msCompile",
