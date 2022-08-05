@@ -63,6 +63,11 @@ export async function resolveDebugConfiguration(folder: vscode.WorkspaceFolder |
 
         const rspFile = await generateIlcResponseFile(path.join(folder.uri.fsPath, 'src', 'tests', runtimeTest), testConfig);
 
+        if (rspFile === null) {
+            vscode.window.showErrorMessage('Unable to generate ILC response file');
+            return undefined;
+        }
+
         return transformConfig(debugConfiguration, getCoreClrOutputRootPath(folder.uri, testConfig), rspFile, ...(debugConfiguration.args || []));
     }
     return debugConfiguration;
