@@ -7,11 +7,12 @@ using MSBuildLoggerVerbosity = Microsoft.Build.Framework.LoggerVerbosity;
 
 namespace AssistantServer;
 
-internal sealed partial class MSBuildRunner
+internal sealed partial class MSBuildRunner : IDisposable
 {
     private readonly ProjectCollection projectCollection;
     private readonly BuildManager buildManager;
     private readonly ILogger logger;
+    private event Action OnDispose;
 
     public MSBuildRunner(ILogger logger)
     {
@@ -21,6 +22,7 @@ internal sealed partial class MSBuildRunner
         projectCollection.RegisterLogger(new ConsoleLogger(MSBuildLoggerVerbosity.Normal, line => logger.LogMSBuildOutput(line), _ => { }, () => { }));
         buildManager = new BuildManager("AssistantServer");
         buildManager.BeginBuild(new BuildParameters(projectCollection));
+        OnDispose += buildManager.EndBuild;
     }
 
     public string[] GetProjectTargetFrameworks(string projectPath)
@@ -57,5 +59,10 @@ internal sealed partial class MSBuildRunner
         var submission = buildManager.BuildRequest(new BuildRequestData(projectInstance, new[] { "GenerateRunSettingsFile" }));
 
         return submission.OverallResult == BuildResultCode.Success;
+    }
+
+    public void Dispose()
+    {
+        OnDispose?.Invoke();
     }
 }

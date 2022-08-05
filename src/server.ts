@@ -62,6 +62,13 @@ export async function getOrStartServerConnection(): Promise<rpc.MessageConnectio
     return currentServerConnection;
 }
 
+export async function disconnectServer() {
+    const server = currentServerConnection;
+    currentServerConnection = null;
+    server?.end();
+    server?.dispose();
+}
+
 namespace GetProjectProperties {
     export const method = 'GetProjectProperties';
 

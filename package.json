@@ -19,6 +19,7 @@
 	],
 	"activationEvents": [
 		"onCommand:dotnet-runtime-test-assistant.startServerIfNotStarted",
+		"onCommand:dotnet-runtime-test-assistant.shutdownServer",
 		"onCommand:dotnet-runtime-test-assistant.importSettingsFromDevContainer",
 		"onCommand:dotnet-runtime-test-assistant.configureRunSettingsFileForTestRun",
 		"onDebugResolve:rt-runtimetest",
@@ -36,6 +37,10 @@
 			{
 				"command": "dotnet-runtime-test-assistant.startServerIfNotStarted",
 				"title": "DN/RT-Test: Start the assistant server"
+			},
+			{
+				"command": "dotnet-runtime-test-assistant.shutdownServer",
+				"title": "DN/RT-Test: Stop the assistant server"
 			},
 			{
 				"command": "dotnet-runtime-test-assistant.importSettingsFromDevContainer",
