@@ -103,3 +103,15 @@ export async function tryCreateVsCodeRunSettings(preTestProjectPath: string, con
     const serverConnection = await getOrStartServerConnection();
     return await serverConnection.sendRequest(TryCreateVsCodeRunSettings.type, preTestProjectPath, configuration.os, configuration.arch, configuration.configuration);
 }
+
+namespace GenerateIlcResponseFile {
+    export const method = 'GenerateIlcResponseFile';
+
+    export const type = new RequestType4<string, string, string, string, string, void>(method);
+}
+
+export async function generateIlcResponseFile(runtimeTestProjectPath: string, configuration: OutputConfiguration) {
+    log(`Generating ILC response file for the runtime test '${runtimeTestProjectPath}' with configuration '${configuration.os}.${configuration.arch}.${configuration.configuration}'`);
+    const serverConnection = await getOrStartServerConnection();
+    return await serverConnection.sendRequest(GenerateIlcResponseFile.type, runtimeTestProjectPath, configuration.os, configuration.arch, configuration.configuration);
+}
