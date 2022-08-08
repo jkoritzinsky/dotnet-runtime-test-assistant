@@ -16,7 +16,7 @@ internal sealed partial class MSBuildRunner : IDisposable
     private static readonly string BinLogPathRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Temp", "dnrt-assistant");
     private readonly ProjectCollection projectCollection;
     private readonly BuildManager buildManager;
-    private readonly MuxLogger evaluationMuxLogger;
+    private readonly EvaluationLogger evaluationLogger;
     private readonly ILogger logger;
 
     public MSBuildRunner(ILogger logger)
@@ -31,68 +31,44 @@ internal sealed partial class MSBuildRunner : IDisposable
                     logger.LogMSBuildOutput(line),
                     _ => { },
                     () => { }));
-        projectCollection.RegisterLogger(evaluationMuxLogger = new());
+        projectCollection.RegisterLogger(evaluationLogger = new());
         buildManager = new BuildManager("AssistantServer");
     }
 
     private BinaryLogger GetBinlogForRequest([CallerMemberName] string requestName = "")
     {
         string binlogPath = Path.Combine(BinLogPathRoot, $"{requestName}-{Guid.NewGuid()}.binlog");
-        BinaryLogger log = new() { Parameters = $"{binlogPath}" };
-        log.CollectProjectImports = BinaryLogger.ProjectImportsCollectionMode.Embed;
+        BinaryLogger log = new()
+        {
+            Parameters = $"{binlogPath}",
+            CollectProjectImports = BinaryLogger.ProjectImportsCollectionMode.Embed
+        };
         logger.BinlogPathForRequest(binlogPath, requestName);
         return log;
-    }
-
-    private static void MergeBinLogs(BinaryLogger sink, params BinaryLogger[] sources)
-    {
-        BinaryLogReplayEventSource replaySource = new();
-        sink.Initialize(replaySource);
-        foreach (var source in sources)
-        {
-            replaySource.Replay(source.Parameters);
-        }
-        sink.Shutdown();
     }
 
     public string[] GetProjectTargetFrameworks(string projectPath)
     {
         logger.GetProjectTargetFrameworks(projectPath);
-        BinaryLogger binLog = GetBinlogForRequest();
-        evaluationMuxLogger.RegisterLogger(EvaluationSubmissionId, binLog);
-        try
-        {
-            var project = projectCollection.LoadProject(projectPath);
-            var targetFrameworks = project.GetPropertyValue("TargetFrameworks");
-            return !string.IsNullOrEmpty(targetFrameworks) ? targetFrameworks.Split(';') : new string[] { project.GetPropertyValue("TargetFramework") };
-        }
-        finally
-        {
-            evaluationMuxLogger.UnregisterLoggers(EvaluationSubmissionId);
-            binLog.Shutdown();
-        }
+        var project = projectCollection.LoadProject(projectPath);
+        evaluationLogger.ReplayEventsForEvaluationId(project.LastEvaluationId, GetBinlogForRequest());
+
+        var targetFrameworks = project.GetPropertyValue("TargetFrameworks");
+        return !string.IsNullOrEmpty(targetFrameworks) ? targetFrameworks.Split(';') : new string[] { project.GetPropertyValue("TargetFramework") };
     }
 
     public Dictionary<string, string> GetProjectProperties(string projectPath, string[] properties)
     {
         logger.GetProjectProperties(projectPath, properties);
-        BinaryLogger binLog = GetBinlogForRequest();
-        evaluationMuxLogger.RegisterLogger(EvaluationSubmissionId, binLog);
-        try
+        var project = projectCollection.LoadProject(projectPath);
+        evaluationLogger.ReplayEventsForEvaluationId(project.LastEvaluationId, GetBinlogForRequest());
+
+        Dictionary<string, string> results = new();
+        foreach (var property in properties)
         {
-            var project = projectCollection.LoadProject(projectPath);
-            Dictionary<string, string> results = new();
-            foreach (var property in properties)
-            {
-                results[property] = project.GetPropertyValue(property);
-            }
-            return results;
+            results[property] = project.GetPropertyValue(property);
         }
-        finally
-        {
-            evaluationMuxLogger.UnregisterLoggers(EvaluationSubmissionId);
-            binLog.Shutdown();
-        }
+        return results;
     }
 
     public bool TryCreateVsCodeRunSettings(string preTestProject, string operatingSystem, string architecture, string configuration)
@@ -105,10 +81,8 @@ internal sealed partial class MSBuildRunner : IDisposable
             Loggers = new[] { buildMuxLogger }
         });
 
+        var replayLogger = new ReplayLogger();
         BinaryLogger finalBinLog = GetBinlogForRequest($"{nameof(TryCreateVsCodeRunSettings)}");
-        BinaryLogger evalBinLog = GetBinlogForRequest($"{nameof(TryCreateVsCodeRunSettings)}-evaltemp");
-        BinaryLogger execBinLog = GetBinlogForRequest($"{nameof(TryCreateVsCodeRunSettings)}-exectemp");
-        evaluationMuxLogger.RegisterLogger(EvaluationSubmissionId, evalBinLog);
         try
         {
             var projectInstance = buildManager.GetProjectInstanceForBuild(
@@ -120,17 +94,17 @@ internal sealed partial class MSBuildRunner : IDisposable
                     { "CreateVsCodeRunSettingsFile", "true" }
                 },
                 projectCollection.DefaultToolsVersion));
+            evaluationLogger.ReplayEventsForEvaluationId(projectInstance.EvaluationId, replayLogger);
             var submission = buildManager.PendBuildRequest(new BuildRequestData(projectInstance, new[] { "GenerateRunSettingsFile" }));
-            buildMuxLogger.RegisterLogger(submission.SubmissionId, execBinLog);
+            buildMuxLogger.RegisterLogger(submission.SubmissionId, replayLogger);
             var result = submission.Execute();
 
             return result.OverallResult == BuildResultCode.Success;
         }
         finally
         {
-            evaluationMuxLogger.UnregisterLoggers(EvaluationSubmissionId);
             buildManager.EndBuild();
-            MergeBinLogs(finalBinLog, evalBinLog, execBinLog);
+            replayLogger.ReplayEvents(finalBinLog);
         }
     }
 
@@ -143,10 +117,8 @@ internal sealed partial class MSBuildRunner : IDisposable
             LogInitialPropertiesAndItems = true,
             Loggers = new[] { buildMuxLogger }
         });
+        var replayLogger = new ReplayLogger();
         BinaryLogger finalBinLog = GetBinlogForRequest($"{nameof(GenerateIlcResponseFile)}");
-        BinaryLogger evalBinLog = GetBinlogForRequest($"{nameof(GenerateIlcResponseFile)}-evaltemp");
-        BinaryLogger execBinLog = GetBinlogForRequest($"{nameof(GenerateIlcResponseFile)}-exectemp");
-        evaluationMuxLogger.RegisterLogger(EvaluationSubmissionId, evalBinLog);
         try
         {
             var projectInstance = buildManager.GetProjectInstanceForBuild(
@@ -159,8 +131,9 @@ internal sealed partial class MSBuildRunner : IDisposable
                     { "IlcDynamicBuildPropertyDependencies", "_ComputeResolvedCopyLocalPublishAssets" }
                 },
                 projectCollection.DefaultToolsVersion));
+            evaluationLogger.ReplayEventsForEvaluationId(projectInstance.EvaluationId, replayLogger);
             var submission = buildManager.PendBuildRequest(new BuildRequestData(projectInstance, new[] { "Build", "GetCopyToPublishDirectoryItems", "_ComputeAssembliesToCompileToNative", "WriteIlcRspFileForCompilation" }));
-            buildMuxLogger.RegisterLogger(submission.SubmissionId, execBinLog);
+            buildMuxLogger.RegisterLogger(submission.SubmissionId, replayLogger);
             var result = submission.Execute();
 
             if (result.OverallResult != BuildResultCode.Success)
@@ -172,9 +145,8 @@ internal sealed partial class MSBuildRunner : IDisposable
         }
         finally
         {
-            evaluationMuxLogger.UnregisterLoggers(EvaluationSubmissionId);
             buildManager.EndBuild();
-            MergeBinLogs(finalBinLog, evalBinLog, execBinLog);
+            replayLogger.ReplayEvents(finalBinLog);
         }
     }
 
