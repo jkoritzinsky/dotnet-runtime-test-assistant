@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 
 namespace AssistantServer;
@@ -31,4 +32,11 @@ internal static partial class Log
         Message = "MSBuild: {message}"
     )]
     public static partial void LogMSBuildOutput(this ILogger logger, string message);
+
+    [LoggerMessage(
+        EventId = 4,
+        Level = LogLevel.Information,
+        Message = "Creating MSBuild binary log at '{path}' for the current request {requestType}"
+    )]
+    public static partial void BinlogPathForRequest(this ILogger logger, string path, string requestType);
 }
