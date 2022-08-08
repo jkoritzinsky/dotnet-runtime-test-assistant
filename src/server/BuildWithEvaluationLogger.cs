@@ -3,12 +3,19 @@ using Microsoft.Build.Logging;
 
 namespace AssistantServer;
 
-internal class ReplayLogger : ILogger
+internal class BuildWithEvaluationLogger : ILogger
 {
+    private readonly HashSet<int> _recordedEvaluations = new();
     private readonly List<BuildEventArgs> _events = new();
+    private readonly EvaluationLogger evaluationLogger;
 
     public LoggerVerbosity Verbosity { get; set; }
     public string Parameters { get; set; } = string.Empty;
+
+    public BuildWithEvaluationLogger(EvaluationLogger evaluationLogger)
+    {
+        this.evaluationLogger = evaluationLogger;
+    }
 
     public void Initialize(IEventSource eventSource)
     {
@@ -21,6 +28,19 @@ internal class ReplayLogger : ILogger
         {
             ev4.IncludeEvaluationPropertiesAndItems();
         }
+        eventSource.BuildStarted += (o, e) =>
+        {
+            int evaluationId = e.BuildEventContext.EvaluationId;
+            lock (_recordedEvaluations)
+            {
+                if (!_recordedEvaluations.Contains(evaluationId))
+                {
+                    ReplayLogger replay = new();
+                    evaluationLogger.ReplayEventsForEvaluationId(evaluationId, replay);
+                    _events.AddRange(replay.Events);
+                }
+            }
+        };
         eventSource.AnyEventRaised += (o, e) => _events.Add(e);
     }
 
@@ -40,8 +60,6 @@ internal class ReplayLogger : ILogger
             logger.Shutdown();
         }
     }
-
-    public IReadOnlyList<BuildEventArgs> Events => _events;
 
     public void Shutdown()
     {

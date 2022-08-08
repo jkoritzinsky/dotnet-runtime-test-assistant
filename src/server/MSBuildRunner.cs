@@ -11,8 +11,6 @@ namespace AssistantServer;
 
 internal sealed partial class MSBuildRunner : IDisposable
 {
-    // All evaluation submission IDs are the invalid submission ID of -1.
-    private const int EvaluationSubmissionId = -1;
     private static readonly string BinLogPathRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Temp", "dnrt-assistant");
     private readonly ProjectCollection projectCollection;
     private readonly BuildManager buildManager;
@@ -81,8 +79,8 @@ internal sealed partial class MSBuildRunner : IDisposable
             Loggers = new[] { buildMuxLogger }
         });
 
-        var replayLogger = new ReplayLogger();
-        BinaryLogger finalBinLog = GetBinlogForRequest($"{nameof(TryCreateVsCodeRunSettings)}");
+        var replayLogger = new BuildWithEvaluationLogger(evaluationLogger);
+        BinaryLogger finalBinLog = GetBinlogForRequest();
         try
         {
             var projectInstance = buildManager.GetProjectInstanceForBuild(
@@ -94,7 +92,6 @@ internal sealed partial class MSBuildRunner : IDisposable
                     { "CreateVsCodeRunSettingsFile", "true" }
                 },
                 projectCollection.DefaultToolsVersion));
-            evaluationLogger.ReplayEventsForEvaluationId(projectInstance.EvaluationId, replayLogger);
             var submission = buildManager.PendBuildRequest(new BuildRequestData(projectInstance, new[] { "GenerateRunSettingsFile" }));
             buildMuxLogger.RegisterLogger(submission.SubmissionId, replayLogger);
             var result = submission.Execute();
@@ -117,8 +114,8 @@ internal sealed partial class MSBuildRunner : IDisposable
             LogInitialPropertiesAndItems = true,
             Loggers = new[] { buildMuxLogger }
         });
-        var replayLogger = new ReplayLogger();
-        BinaryLogger finalBinLog = GetBinlogForRequest($"{nameof(GenerateIlcResponseFile)}");
+        var replayLogger = new BuildWithEvaluationLogger(evaluationLogger);
+        BinaryLogger finalBinLog = GetBinlogForRequest();
         try
         {
             var projectInstance = buildManager.GetProjectInstanceForBuild(
@@ -131,7 +128,6 @@ internal sealed partial class MSBuildRunner : IDisposable
                     { "IlcDynamicBuildPropertyDependencies", "_ComputeResolvedCopyLocalPublishAssets" }
                 },
                 projectCollection.DefaultToolsVersion));
-            evaluationLogger.ReplayEventsForEvaluationId(projectInstance.EvaluationId, replayLogger);
             var submission = buildManager.PendBuildRequest(new BuildRequestData(projectInstance, new[] { "Build", "GetCopyToPublishDirectoryItems", "_ComputeAssembliesToCompileToNative", "WriteIlcRspFileForCompilation" }));
             buildMuxLogger.RegisterLogger(submission.SubmissionId, replayLogger);
             var result = submission.Execute();
