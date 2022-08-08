@@ -29,7 +29,9 @@
 		"onDebugResolve:rt-cg2rt",
 		"onDebugDynamicConfigurations:rt-cg2rt",
 		"onDebugResolve:rt-libsnative",
-		"onDebugDynamicConfigurations:rt-libsnative"
+		"onDebugDynamicConfigurations:rt-libsnative",
+		"onDebugResolve:rt-ilc",
+		"onDebugDynamicConfigurations:rt-ilc"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -199,6 +201,50 @@
 						"body": {
 							"name": "Launch Crossgen2 against a runtime test",
 							"type": "rt-cg2rt",
+							"request": "launch"
+						}
+					}
+				]
+			},
+			{
+				"type": "rt-ilc",
+				"label": "Debug running ILC on a runtime test",
+				"configurationAttributes": {
+					"launch": {
+						"properties": {
+							"args": {
+								"description": "Program arguments.",
+								"type": [
+									"array",
+									"string"
+								],
+								"default": []
+							},
+							"env": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string"
+								},
+								"description": "Environment variables to set for the target process"
+							},
+							"cwd": {
+								"type": "string",
+								"description": "The working directory for the target process"
+							},
+							"stopAtEntry": {
+								"type": "boolean",
+								"description": "true if the debugger should break as soon as the process is started."
+							}
+						}
+					}
+				},
+				"configurationSnippets": [
+					{
+						"label": "DN/RT-Assistant: Launch ILC against a runtime test",
+						"description": "A new configuration for running ILC to generate native code for a runtime test.",
+						"body": {
+							"name": "Launch ILC against a runtime test",
+							"type": "rt-ilc",
 							"request": "launch"
 						}
 					}

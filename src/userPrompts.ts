@@ -166,6 +166,15 @@ export async function promptUserForLibrariesTest(options: { workspace: vscode.Ur
 	return result.originalData;
 }
 
+async function getAllRuntimeTestProjects(workspaceFolder: vscode.Uri) {
+	const testPathRoot = path.join(workspaceFolder.fsPath, 'src', 'tests');
+	return await promisify(glob)('**/*.*proj', { cwd: testPathRoot });
+}
+
+export async function promptUserForRuntimeTestProject(options: { workspace: vscode.Uri }) {
+	return await promptQuickPick(await getAllRuntimeTestProjects(options.workspace), { title: 'Select a runtime test project' });
+}
+
 function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (value: T) => vscode.QuickPickItem & TAdditionalProperties, defaultValue?: T) {
 	let defaultQuickPick: vscode.QuickPickItem | undefined = undefined;
 	let quickPickItems = values.map(item => {
