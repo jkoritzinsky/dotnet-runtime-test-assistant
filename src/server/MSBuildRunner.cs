@@ -71,7 +71,12 @@ internal sealed partial class MSBuildRunner : IDisposable
 
     public bool TryCreateVsCodeRunSettings(string preTestProject, string operatingSystem, string architecture, string configuration)
     {
-        MuxLogger buildMuxLogger = new();
+        MuxLogger buildMuxLogger = new()
+        {
+            IncludeEvaluationMetaprojects = true,
+            IncludeEvaluationPropertiesAndItems = true,
+            IncludeTaskInputs = true,
+        };
         buildManager.BeginBuild(new BuildParameters(projectCollection)
         {
             LogTaskInputs = true,
@@ -107,7 +112,12 @@ internal sealed partial class MSBuildRunner : IDisposable
 
     public string? GenerateIlcResponseFile(string testProject, string operatingSystem, string architecture, string configuration)
     {
-        MuxLogger buildMuxLogger = new();
+        MuxLogger buildMuxLogger = new()
+        {
+            IncludeEvaluationMetaprojects = true,
+            IncludeEvaluationPropertiesAndItems = true,
+            IncludeTaskInputs = true,
+        };
         buildManager.BeginBuild(new BuildParameters(projectCollection)
         {
             LogTaskInputs = true,

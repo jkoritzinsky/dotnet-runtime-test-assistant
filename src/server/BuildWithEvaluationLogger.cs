@@ -28,7 +28,7 @@ internal class BuildWithEvaluationLogger : ILogger
         {
             ev4.IncludeEvaluationPropertiesAndItems();
         }
-        eventSource.BuildStarted += (o, e) =>
+        eventSource.ProjectStarted += (o, e) =>
         {
             int evaluationId = e.BuildEventContext.EvaluationId;
             lock (_recordedEvaluations)
