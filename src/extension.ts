@@ -5,7 +5,7 @@ import * as crossgen2TestProvider from './providers/crossgen2';
 import * as ilcTestProvider from './providers/ilc';
 import * as libsNativeTestProvider from './providers/libs-native';
 import { setServerPathFromExtensionContext, getOrStartServerConnection, disconnectServer } from './server';
-import { configureRunSettingsFileForTestRun, importSettingsFromDevContainer } from './commands';
+import { configureRunSettingsFileForTestRun, getSubsetsToBuild, importSettingsFromDevContainer } from './commands';
 
 type CustomDebugConfigurationProvider = vscode.DebugConfigurationProvider & {
 	DEBUG_CONFIGURATION_TYPE: string;
@@ -43,6 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('dotnet-runtime-test-assistant.shutdownServer', disconnectServer));
 	context.subscriptions.push(vscode.commands.registerCommand('dotnet-runtime-test-assistant.importSettingsFromDevContainer', importSettingsFromDevContainer));
 	context.subscriptions.push(vscode.commands.registerCommand('dotnet-runtime-test-assistant.configureRunSettingsFileForTestRun', configureRunSettingsFileForTestRun));
+	context.subscriptions.push(vscode.commands.registerCommand('dotnet-runtime-test-assistant.getSubsetsToBuild', getSubsetsToBuild));
 
 	context.subscriptions.push(registerDebugConfigurationProvider(runtimeTestProvider));
 	context.subscriptions.push(registerDebugConfigurationProvider(crossgen2CoreLibTestProvider));

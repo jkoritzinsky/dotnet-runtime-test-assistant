@@ -1,9 +1,10 @@
 import path = require('path');
 import * as vscode from 'vscode';
 import { parse } from 'jsonc-parser';
-import { getRuntimeWorkspaceFolder, promptUserForTargetConfiguration } from './userPrompts';
+import { getRuntimeWorkspaceFolder, promptUserForBuildSubsets, promptUserForTargetConfiguration } from './userPrompts';
 import { readFile } from 'fs/promises';
-import { tryCreateVsCodeRunSettings } from './server';
+import { getBuildSubsets, tryCreateVsCodeRunSettings } from './server';
+import { BuildSubset } from './helpers';
 
 // Import settings from the devcontainer configuration file into the local .vscode/settings.json file
 // if the setting is not already specified.
@@ -44,4 +45,19 @@ export async function configureRunSettingsFileForTestRun() {
     } else {
         vscode.window.showErrorMessage('Unable to regenerate runsettings file. Check the dotnet-runtime-assistant-server log output for details');
     }
+}
+
+export async function getSubsetsToBuild() {
+    const workspace = await getRuntimeWorkspaceFolder();
+    if (!workspace) {
+        return undefined;
+    }
+    const subsets = await promptUserForBuildSubsets(await getBuildSubsets(path.join(workspace.fsPath, 'Build.proj')));
+    if (subsets === undefined) {
+        return undefined;
+    }
+    if (subsets === []) {
+        return '';
+    }
+    return subsets.map(subset => subset.Name.toLowerCase()).join('+');
 }

@@ -22,6 +22,7 @@
 		"onCommand:dotnet-runtime-test-assistant.shutdownServer",
 		"onCommand:dotnet-runtime-test-assistant.importSettingsFromDevContainer",
 		"onCommand:dotnet-runtime-test-assistant.configureRunSettingsFileForTestRun",
+		"onCommand:dotnet-runtime-test-assistant.getSubsetsToBuild",
 		"onDebugResolve:rt-runtimetest",
 		"onDebugDynamicConfigurations:rt-runtimetest",
 		"onDebugResolve:rt-cg2corelib",
@@ -51,6 +52,10 @@
 			{
 				"command": "dotnet-runtime-test-assistant.configureRunSettingsFileForTestRun",
 				"title": "DN/RT-Test: Configure the .runsettings file for running tests in VSCode"
+			},
+			{
+				"command": "dotnet-runtime-test-assistant.getSubsetsToBuild",
+				"title": "DN/RT-Test: Get subsets to build"
 			}
 		],
 		"debuggers": [

@@ -39,4 +39,11 @@ internal static partial class Log
         Message = "Creating MSBuild binary log at '{path}' for the current request {requestType}"
     )]
     public static partial void BinlogPathForRequest(this ILogger logger, string path, string requestType);
+
+    [LoggerMessage(
+        EventId = 5,
+        Level = LogLevel.Information,
+        Message = "Getting build subset items from project file '{projectFile}'."
+    )]
+    public static partial void GetBuildSubsets(this ILogger logger, string projectFile);
 }

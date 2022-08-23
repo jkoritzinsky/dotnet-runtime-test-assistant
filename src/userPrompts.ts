@@ -5,7 +5,7 @@ import { promisify } from 'util';
 import { existsSync } from 'fs';
 import * as os from 'os';
 import * as vscode from 'vscode';
-import { getRuntimeTestArtifactsPath } from './helpers';
+import { BuildSubset, getRuntimeTestArtifactsPath } from './helpers';
 import { readdir } from 'fs/promises';
 import { OutputConfiguration } from './outputConfiguration';
 
@@ -151,19 +151,13 @@ async function getAllBuiltLibrariesTests(workspaceFolder: vscode.Uri, configurat
 
 export async function promptUserForLibrariesTest(options: { workspace: vscode.Uri, configuration: OutputConfiguration }) {
 	const librariesTestProjects = await getAllBuiltLibrariesTests(options.workspace, options.configuration);
-	let result = await vscode.window.showQuickPick(createQuickPickItems(librariesTestProjects, project => {
+	return await showQuickPick(createQuickPickItems(librariesTestProjects, project => {
 		return {
 			label: project.projectName,
 			description: `(${project.tfm})`,
 			originalData: project
 		};
-	}), { title: 'Select a libaries test assembly to run.', matchOnDescription: true });
-
-	if (result === undefined) {
-		return result;
-	}
-
-	return result.originalData;
+	}), { title: 'Select a libaries test assembly to run.', matchOnDescription: true, selectData: item => item.originalData });
 }
 
 async function getAllRuntimeTestProjects(workspaceFolder: vscode.Uri) {
@@ -173,6 +167,38 @@ async function getAllRuntimeTestProjects(workspaceFolder: vscode.Uri) {
 
 export async function promptUserForRuntimeTestProject(options: { workspace: vscode.Uri }) {
 	return await promptQuickPick(await getAllRuntimeTestProjects(options.workspace), { title: 'Select a runtime test project' });
+}
+
+export async function promptUserForBuildSubsets(allSubsets: BuildSubset[]): Promise<BuildSubset[] | undefined> {
+	const defaultItem: BuildSubset = {
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		Name: 'Default subsets',
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		Description: 'The default subsets for the target platform. Cannot be combined with other subsets',
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		OnDemand: false
+	};
+	let result = await showMultiQuickPick(createQuickPickItems([...allSubsets, defaultItem], subset => {
+		return {
+			label: subset.Name,
+			description: subset.OnDemand ? '(on demand)' : undefined,
+			detail: subset.Description,
+			subset: subset
+		};
+	}, defaultItem), { title: 'Select build subsets:', selectData: item => item.subset });
+
+	if (!result) {
+		return undefined;
+	}
+
+	if (result.indexOf(defaultItem) !== -1) {
+		if (result.length !== 1) {
+			vscode.window.showErrorMessage('The default subsets option cannot be combined with other options');
+			return undefined;
+		}
+		return [];
+	}
+	return result;
 }
 
 function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (value: T) => vscode.QuickPickItem & TAdditionalProperties, defaultValue?: T) {
@@ -185,6 +211,7 @@ function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (v
 			} else {
 				quickPick.description = '(default)';
 			}
+			quickPick.picked = true;
 			defaultQuickPick = quickPick;
 		}
 		return quickPick;
@@ -193,9 +220,24 @@ function createQuickPickItems<T, TAdditionalProperties>(values: T[], factory: (v
 	return defaultQuickPick === undefined ? quickPickItems : [defaultQuickPick, ...quickPickItems.filter(item => item !== defaultQuickPick)];
 }
 
-export async function promptQuickPick(values: string[], options: vscode.QuickPickOptions & { default?: string }) {
-	let result = await vscode.window.showQuickPick(createQuickPickItems(values, value => {
+async function showQuickPick<TQuickPickItem extends vscode.QuickPickItem, TResult>(values: TQuickPickItem[], options: vscode.QuickPickOptions & { selectData: (item: TQuickPickItem) => TResult }) {
+	const result = await vscode.window.showQuickPick(values, options);
+	if (result === undefined) {
+		return undefined;
+	}
+	return options.selectData(result);
+}
+
+async function showMultiQuickPick<TQuickPickItem extends vscode.QuickPickItem, TResult>(values: TQuickPickItem[], options: vscode.QuickPickOptions & { selectData: (item: TQuickPickItem) => TResult }) {
+	const result = await vscode.window.showQuickPick(values, { ...options, canPickMany: true });
+	if (result === undefined) {
+		return undefined;
+	}
+	return result.map(options.selectData);
+}
+
+export function promptQuickPick(values: string[], options: vscode.QuickPickOptions & { default?: string }) {
+	return showQuickPick(createQuickPickItems(values, value => {
 		return { label: value };
-	}, options.default), options);
-	return result?.label;
+	}, options.default), { ...options, selectData: item => item.label });
 }

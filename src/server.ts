@@ -5,8 +5,9 @@ import * as path from 'path';
 import { getRuntimeWorkspaceFolder } from './userPrompts';
 import * as os from 'os';
 import log from './log';
-import { RequestType2, RequestType4 } from 'vscode-jsonrpc/node';
+import { RequestType, RequestType2, RequestType4 } from 'vscode-jsonrpc/node';
 import { OutputConfiguration } from './outputConfiguration';
+import { BuildSubset } from './helpers';
 
 export function setServerPathFromExtensionContext(context: vscode.ExtensionContext) {
     serverPath = path.join(context.extensionUri.fsPath, 'out', 'server', 'AssistantServer.dll');
@@ -114,4 +115,16 @@ export async function generateIlcResponseFile(runtimeTestProjectPath: string, co
     log(`Generating ILC response file for the runtime test '${runtimeTestProjectPath}' with configuration '${configuration.os}.${configuration.arch}.${configuration.configuration}'`);
     const serverConnection = await getOrStartServerConnection();
     return await serverConnection.sendRequest(GenerateIlcResponseFile.type, runtimeTestProjectPath, configuration.os, configuration.arch, configuration.configuration);
+}
+
+namespace GetBuildSubsets {
+    export const method = 'GetBuildSubsets';
+
+    export const type = new RequestType<string, BuildSubset[], void>(method);
+}
+
+export async function getBuildSubsets(rootBuildProjectPath: string) {
+    log('Getting build subsets');
+    const serverConnection = await getOrStartServerConnection();
+    return await serverConnection.sendRequest(GetBuildSubsets.type, rootBuildProjectPath);
 }

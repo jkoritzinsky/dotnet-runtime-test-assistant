@@ -38,3 +38,12 @@ export interface DebugConfigurationBase extends DebugConfiguration {
     request: 'launch',
     stopAtEntry: boolean
 }
+
+export interface BuildSubset {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Name: string,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Description: string,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    OnDemand: boolean
+};

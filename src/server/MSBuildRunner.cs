@@ -156,6 +156,31 @@ internal sealed partial class MSBuildRunner : IDisposable
         }
     }
 
+    public readonly record struct BuildSubset(string Name, string Description, bool OnDemand);
+
+    public BuildSubset[] GetBuildSubsets(string rootBuildProjectPath)
+    {
+        logger.GetBuildSubsets(rootBuildProjectPath);
+        var project = projectCollection.LoadProject(rootBuildProjectPath);
+        evaluationLogger.ReplayEventsForEvaluationId(project.LastEvaluationId, GetBinlogForRequest());
+
+        List<BuildSubset> subsets = new();
+
+        foreach (var item in project.Items.Where(item => item.ItemType == "SubsetName"))
+        {
+            subsets.Add(new()
+            {
+                Name = item.GetMetadataValue("Identity"),
+                Description = item.GetMetadataValue(nameof(BuildSubset.Description)),
+                OnDemand = item.HasMetadata(nameof(BuildSubset.OnDemand))
+                    && bool.TryParse(item.GetMetadataValue(nameof(BuildSubset.OnDemand)), out var onDemand)
+                    && onDemand
+            });
+        }
+
+        return subsets.ToArray();
+    }
+
     public void Dispose()
     {
     }
