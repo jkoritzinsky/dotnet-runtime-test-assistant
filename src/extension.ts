@@ -4,6 +4,7 @@ import * as crossgen2CoreLibTestProvider from './providers/crossgen2-corelib';
 import * as crossgen2TestProvider from './providers/crossgen2';
 import * as ilcTestProvider from './providers/ilc';
 import * as libsNativeTestProvider from './providers/libs-native';
+import * as buildTaskProvider from './providers/build';
 import { setServerPathFromExtensionContext, getOrStartServerConnection, disconnectServer } from './server';
 import { configureRunSettingsFileForTestRun, getSubsetsToBuild, importSettingsFromDevContainer } from './commands';
 
@@ -50,6 +51,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(registerDebugConfigurationProvider(crossgen2TestProvider));
 	context.subscriptions.push(registerDebugConfigurationProvider(ilcTestProvider));
 	context.subscriptions.push(registerDebugConfigurationProvider(libsNativeTestProvider));
+
+	context.subscriptions.push(vscode.tasks.registerTaskProvider('runtime-build', buildTaskProvider));
 	context.subscriptions.push({ dispose: disconnectServer });
 
 	setServerPathFromExtensionContext(context);

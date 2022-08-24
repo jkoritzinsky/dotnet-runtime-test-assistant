@@ -1,7 +1,7 @@
 import path = require('path');
 import * as vscode from 'vscode';
 import { parse } from 'jsonc-parser';
-import { getRuntimeWorkspaceFolder, promptUserForBuildSubsets, promptUserForTargetConfiguration } from './userPrompts';
+import { getRuntimeWorkspaceFolderUri, promptUserForBuildSubsets, promptUserForTargetConfiguration } from './userPrompts';
 import { readFile } from 'fs/promises';
 import { getBuildSubsets, tryCreateVsCodeRunSettings } from './server';
 import { BuildSubset } from './helpers';
@@ -9,7 +9,7 @@ import { BuildSubset } from './helpers';
 // Import settings from the devcontainer configuration file into the local .vscode/settings.json file
 // if the setting is not already specified.
 export async function importSettingsFromDevContainer() {
-    const workspace = await getRuntimeWorkspaceFolder();
+    const workspace = await getRuntimeWorkspaceFolderUri();
     if (!workspace) {
         return;
     }
@@ -31,7 +31,7 @@ export async function importSettingsFromDevContainer() {
 }
 
 export async function configureRunSettingsFileForTestRun() {
-    const workspace = await getRuntimeWorkspaceFolder();
+    const workspace = await getRuntimeWorkspaceFolderUri();
     if (!workspace) {
         return;
     }
@@ -48,7 +48,7 @@ export async function configureRunSettingsFileForTestRun() {
 }
 
 export async function getSubsetsToBuild() {
-    const workspace = await getRuntimeWorkspaceFolder();
+    const workspace = await getRuntimeWorkspaceFolderUri();
     if (!workspace) {
         return undefined;
     }

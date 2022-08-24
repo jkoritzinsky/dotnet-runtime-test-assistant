@@ -32,7 +32,8 @@
 		"onDebugResolve:rt-libsnative",
 		"onDebugDynamicConfigurations:rt-libsnative",
 		"onDebugResolve:rt-ilc",
-		"onDebugDynamicConfigurations:rt-ilc"
+		"onDebugDynamicConfigurations:rt-ilc",
+		"onTaskType:runtime-build"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -303,6 +304,52 @@
 						}
 					}
 				]
+			}
+		],
+		"taskDefinitions": [
+			{
+				"type": "runtime-build",
+				"properties": {
+					"subsets": {
+						"type": "string",
+						"pattern": "(\\+?([A-Za-z.]+)(\\+([A-Za-z.]+))*\\+?|)",
+						"description": "Subsets to build"
+					},
+					"configuration": {
+						"type": "string",
+						"enum": [
+							"Debug",
+							"Checked",
+							"Release"
+						]
+					},
+					"runtimeConfiguration": {
+						"type": "string",
+						"enum": [
+							"Debug",
+							"Checked",
+							"Release"
+						]
+					},
+					"librariesConfiguration": {
+						"type": "string",
+						"enum": [
+							"Debug",
+							"Release"
+						]
+					},
+					"arch": {
+						"type": "string"
+					},
+					"runtimeFlavor": {
+						"type": "string",
+						"enum": [
+							"CoreCLR",
+							"Mono"
+						]
+					}
+				},
+				"when": "shellExecutionSupported"
 			}
 		]
 	},

@@ -95,15 +95,19 @@ export async function getRuntimeWorkspaceFolder() {
 		return undefined;
 	}
 	if (workspaceFolders.length === 1) {
-		return workspaceFolders[0].uri;
+		return workspaceFolders[0];
 	}
 
 	let options = workspaceFolders.map(folder => {
-		return { label: folder.name, detail: folder.uri.toString() };
+		return { label: folder.name, detail: folder.uri.toString(), folderObject: folder };
 	});
 
 	let result = await vscode.window.showQuickPick(options, { title: 'Select dotnet/runtime workspace...' });
-	return result === undefined ? undefined : vscode.Uri.parse(result.detail);
+	return result?.folderObject;
+}
+
+export async function getRuntimeWorkspaceFolderUri() {
+	return (await getRuntimeWorkspaceFolder())?.uri;
 }
 
 async function getAllBuiltRuntimeTests(workspaceFolder: vscode.Uri, configuration: OutputConfiguration) {

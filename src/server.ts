@@ -2,7 +2,7 @@ import * as cp from 'child_process';
 import * as rpc from 'vscode-jsonrpc/node';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getRuntimeWorkspaceFolder } from './userPrompts';
+import { getRuntimeWorkspaceFolderUri } from './userPrompts';
 import * as os from 'os';
 import log from './log';
 import { RequestType, RequestType2, RequestType4 } from 'vscode-jsonrpc/node';
@@ -32,7 +32,7 @@ export async function getOrStartServerConnection(): Promise<rpc.MessageConnectio
     }
 
     log('preparing to start server');
-    let runtimeWorkspaceFolder = await getRuntimeWorkspaceFolder();
+    let runtimeWorkspaceFolder = await getRuntimeWorkspaceFolderUri();
     if (!runtimeWorkspaceFolder) {
         log('unable to start server when no dotnet/runtime workspace is open');
         throw new Error('Unable to use the assistant server when no dotnet/runtime workspace is open.');
@@ -89,7 +89,7 @@ export async function getProjectProperties<TProperty extends string>(projectFile
 }
 
 export async function getNetCoreAppCurrentProperty() {
-    const runtimeWorkspaceFolder = await getRuntimeWorkspaceFolder();
+    const runtimeWorkspaceFolder = await getRuntimeWorkspaceFolderUri();
     return (await getProjectProperties(path.join(runtimeWorkspaceFolder!.fsPath, 'Build.proj'), 'NetCoreAppCurrent')).NetCoreAppCurrent;
 }
 
