@@ -10,6 +10,7 @@ interface BuildTaskDefinition extends vscode.TaskDefinition {
     arch?: string,
     runtimeFlavor?: 'CoreCLR' | 'Mono',
     subsets?: string,
+    args?: string[],
 }
 
 function isBuildTaskDefinition(def: vscode.TaskDefinition): def is BuildTaskDefinition {
@@ -67,8 +68,10 @@ export async function resolveTask(task: vscode.Task, _token: vscode.Cancellation
 
         const buildScript = path.join((<vscode.WorkspaceFolder>task.scope).uri.fsPath, 'build');
 
+        let additionalArgs = '';
+        task.definition.args?.forEach(arg => additionalArgs += ` ${arg}`);
         const generateArg = (name: string, value: string | undefined) => value ? `-${name} ${value}` : '';
-        const execution = new vscode.ShellExecution(`${buildScript} ${task.definition.subsets} ${generateArg('c', task.definition.configuration)} ${generateArg('rc', task.definition.runtimeConfiguration)} ${generateArg('lc', task.definition.librariesConfiguration)} ${generateArg('a', task.definition.arch)}  ${generateArg('rf', task.definition.runtimeFlavor)}`);
+        const execution = new vscode.ShellExecution(`${buildScript} ${task.definition.subsets} ${generateArg('c', task.definition.configuration)} ${generateArg('rc', task.definition.runtimeConfiguration)} ${generateArg('lc', task.definition.librariesConfiguration)} ${generateArg('a', task.definition.arch)}  ${generateArg('rf', task.definition.runtimeFlavor)} ${additionalArgs}`);
         task = new vscode.Task(
             task.definition,
             task.scope!,
