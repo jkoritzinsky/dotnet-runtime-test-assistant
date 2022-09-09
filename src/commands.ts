@@ -56,7 +56,7 @@ export async function getSubsetsToBuild() {
     if (subsets === undefined) {
         return undefined;
     }
-    if (subsets === []) {
+    if (subsets.length === 0) {
         return '';
     }
     return subsets.map(subset => subset.Name.toLowerCase()).join('+');
