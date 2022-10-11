@@ -1,5 +1,6 @@
-import path = require('path');
 import * as vscode from 'vscode';
+import * as os from 'os';
+import * as path from 'path';
 import { getRuntimeWorkspaceFolder } from '../userPrompts';
 
 interface BuildTaskDefinition extends vscode.TaskDefinition {
@@ -66,7 +67,11 @@ export async function resolveTask(task: vscode.Task, _token: vscode.Cancellation
             task.definition.subsets = '${command:dotnet-runtime-test-assistant.getSubsetsToBuild}';
         }
 
-        const buildScript = path.join((<vscode.WorkspaceFolder>task.scope).uri.fsPath, 'build');
+        let buildScript = path.join((<vscode.WorkspaceFolder>task.scope).uri.fsPath, 'build');
+
+        if (os.platform() !== 'win32') {
+            buildScript += '.sh';
+        }
 
         const additionalArgs = task.definition.args?.join(' ') ?? '';
         const generateArg = (name: string, value: string | undefined) => value ? `-${name} ${value}` : '';
