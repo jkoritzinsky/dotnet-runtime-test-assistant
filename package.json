@@ -338,6 +338,13 @@
 							"Release"
 						]
 					},
+					"hostConfiguration": {
+						"type": "string",
+						"enum": [
+							"Debug",
+							"Release"
+						]
+					},
 					"arch": {
 						"type": "string"
 					},
