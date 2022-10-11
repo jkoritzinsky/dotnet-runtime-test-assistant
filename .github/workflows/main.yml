@@ -32,4 +32,4 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
-      - run: vsce package --pre-release
+      - run: npx vsce package --pre-release
