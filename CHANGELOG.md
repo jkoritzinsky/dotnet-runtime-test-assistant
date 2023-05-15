@@ -2,8 +2,11 @@
 
 All notable changes to the "dotnet-runtime-test-assistant" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.0.2]
 
-## [Unreleased]
+- Fix build script path on non-Windows.
+- User-defined build tasks must be defined in a `.vscode/runtime-tasks.json` file with the same format as `.vscode/tasks.json`.
+
+## [0.0.1]
 
 - Initial release
