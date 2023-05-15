@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import * as os from 'os';
 import * as path from 'path';
+import * as jsonc from 'jsonc-parser';
 import { getRuntimeWorkspaceFolder } from '../userPrompts';
+import { TextDecoder } from 'util';
 
 interface BuildTaskDefinition extends vscode.TaskDefinition {
     type: 'runtime-build',
@@ -18,12 +20,14 @@ function isBuildTaskDefinition(def: vscode.TaskDefinition): def is BuildTaskDefi
     return def.type === 'runtime-build';
 }
 
+const decoder = new TextDecoder();
+
 export async function provideTasks(token: vscode.CancellationToken): Promise<vscode.Task[] | undefined> {
     let folder = await getRuntimeWorkspaceFolder();
     if (!folder) {
         return undefined;
     }
-    return Promise.all([
+    const presetTasks = await Promise.all([
         new vscode.Task(
             {
                 type: 'runtime-build',
@@ -57,8 +61,25 @@ export async function provideTasks(token: vscode.CancellationToken): Promise<vsc
             'Build CoreCLR Release, Libraries Debug',
             'DN/RT-Test',
             undefined,
-            '$mscompile')
+            '$mscompile'),
     ].map(task => resolveTask(task, token)));
+
+    // We have too many task options to show them all in the quick pick menu, so we just show common ones
+    // and whichever ones the user has already configured in their tasks.json file.
+    const userDefinedTaskDefinitions = jsonc.parse(decoder.decode(await vscode.workspace.fs.readFile(vscode.Uri.joinPath(folder.uri, '.vscode', 'runtime-tasks.json'))));
+    const userDefinedTasks = await Promise.all((userDefinedTaskDefinitions.tasks as any[])
+        .map((task: any) =>
+            new vscode.Task(
+                task,
+                folder!,
+                task.label,
+                'DN/RT-Test',
+                undefined,
+                '$mscompile'
+            ))
+        .map(task => resolveTask(task, token)));
+
+    return presetTasks.concat(userDefinedTasks);
 }
 
 export async function resolveTask(task: vscode.Task, _token: vscode.CancellationToken): Promise<vscode.Task> {
