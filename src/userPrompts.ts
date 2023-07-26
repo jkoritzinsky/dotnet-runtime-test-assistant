@@ -30,7 +30,7 @@ function getDefaultOSOption() {
 export async function promptUserForTargetConfiguration(options: { promptPrefix: string, showChecked: boolean, defaultConfiguration: string, showAllOSChoices?: boolean }): Promise<OutputConfiguration | undefined> {
 	let targetOS: string;
 	if (options.showAllOSChoices) {
-		let userInputTarget = await promptQuickPick(['windows', 'Linux', 'OSX', 'FreeBSD', 'SunOS'], { title: `${options.promptPrefix} OS`, default: getDefaultOSOption() });
+		let userInputTarget = await promptQuickPick(['windows', 'linux', 'osx', 'freebsd', 'sunos'], { title: `${options.promptPrefix} OS`, default: getDefaultOSOption() });
 		if (!userInputTarget) {
 			return undefined;
 		}
@@ -42,17 +42,17 @@ export async function promptUserForTargetConfiguration(options: { promptPrefix: 
 			targetOS = 'windows';
 			break;
 		case 'linux':
-			targetOS = 'Linux';
+			targetOS = 'linux';
 			break;
 		case 'darwin':
 			// TODO: Prompt for mobile platforms (how to run tests on mobile platforms from vscode?)
-			targetOS = 'OSX';
+			targetOS = 'osx';
 			break;
 		case 'freebsd':
-			targetOS = 'FreeBSD';
+			targetOS = 'freebsd';
 			break;
 		case 'sunos':
-			targetOS = 'SunOS';
+			targetOS = 'sunos';
 			break;
 		default:
 			let userInputTarget = await vscode.window.showInputBox({ title: `${options.promptPrefix} OS`, placeHolder: getDefaultOSOption() });
