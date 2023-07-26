@@ -11,19 +11,14 @@
 		"url": "https://github.com/jkoritzinsky"
 	},
 	"publisher": "jkoritzinsky",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"engines": {
-		"vscode": "^1.63.0"
+		"vscode": "^1.80.0"
 	},
 	"categories": [
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:dotnet-runtime-test-assistant.startServerIfNotStarted",
-		"onCommand:dotnet-runtime-test-assistant.shutdownServer",
-		"onCommand:dotnet-runtime-test-assistant.importSettingsFromDevContainer",
-		"onCommand:dotnet-runtime-test-assistant.configureRunSettingsFileForTestRun",
-		"onCommand:dotnet-runtime-test-assistant.getSubsetsToBuild",
 		"onDebugResolve:rt-runtimetest",
 		"onDebugDynamicConfigurations:rt-runtimetest",
 		"onDebugResolve:rt-cg2corelib",
@@ -389,7 +384,7 @@
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^9.0.0",
 		"@types/node": "14.x",
-		"@types/vscode": "^1.63.0",
+		"@types/vscode": "^1.80.0",
 		"@typescript-eslint/eslint-plugin": "^5.9.1",
 		"@typescript-eslint/parser": "^5.9.1",
 		"@vscode/test-electron": "^2.0.3",
