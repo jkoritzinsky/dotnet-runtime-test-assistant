@@ -28,7 +28,7 @@ export function transformConfigForCoreLib(debugConfiguration: Crossgen2CoreLibCo
             `-r:${path.join(corelibBuildCoreClrBin, 'IL', '*.dll')}`,
             `--targetarch:${targetArch}`,
             '-O',
-            `${path.join(corelibBuildCoreClrBin, 'IL', 'System.Private.CoreLib')}`
+            `${path.join(corelibBuildCoreClrBin, 'IL', 'System.Private.CoreLib.dll')}`
         ]
     };
 }
